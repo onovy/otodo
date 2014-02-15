@@ -1,0 +1,10 @@
+(B) 2014-02-01 dummy3
+(A) dummy1
+2014-01-01 dummy2 due:2014-01-01
+x (D) 2014-03-01 dummy6
+x 2014-01-01 (D) 2014-03-01 dummy10
+x 2014-01-01 (C) dummy8
+x (C) dummy5
+x 2014-01-01 2014-03-01 dummy9
+x 2014-01-01 dummy7
+x dummy4

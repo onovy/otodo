@@ -30,8 +30,11 @@ class Todo {
 	protected $todos;
 	protected $validExtensions = array();
 
-	public function __construct($todos) {
+	public function __construct($todos, $str = null) {
 		$this->todos = $todos;
+		if (!is_null($str)) {
+			$this->fillFromString($str);
+		}
 	}
 
 	protected function parseDate($string) {
@@ -63,6 +66,9 @@ class Todo {
 		$this->contexts = array();
 		$this->projects = array();
 		foreach ($cols as $col) {
+			if (empty($col)) {
+				continue;
+			}
 			if ($col[0] == '@') {
 				// Context
 				$this->contexts[] = substr($col, 1);
