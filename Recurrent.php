@@ -31,11 +31,15 @@ class Recurrent {
 			$this->fromNow = true;
 			$str = substr($str, 1);
 		}
-		if (!preg_match('/^(\d+)([dwtmyr])?(b)?$/', $str, $matches)) {
+		if (!preg_match('/^(\d+)([dwmy]?) ?(b)?$/', $str, $matches)) {
 			throw new RecurrentParseException($str);
 		}
 		$this->count = $matches[1];
-		$this->unit = $matches[2];
+		if (isset($matches[2]) && $matches[2] != '') {
+			$this->unit = $matches[2];
+		} else {
+			$this->unit = 'd';
+		}
 		if (isset($matches[3]) && $matches[3] == 'b') {
 			$this->businessDay = true;
 		}
@@ -55,13 +59,13 @@ class Recurrent {
 	}
 
 	public function recurr($oldTs) {
+		assert($oldTs instanceof DateTime || $oldTs === null);
 		if ($this->fromNow || $oldTs === null) {
 			$ts = new DateTime('today');
 		} else {
 			$ts = clone $oldTs;
 		}
 		switch ($this->unit) {
-			default:
 			case 'd':
 				$m = 'day';
 			break;
@@ -69,12 +73,13 @@ class Recurrent {
 				$m = 'month';
 			break;
 			case 'w':
-			case 't':
 				$m = 'week';
 			break;
 			case 'y':
-			case 'r':
 				$m = 'year';
+			break;
+			default:
+				throw new RecurrentParseException('Unknown unit: ' . $this->unit);
 			break;
 		}
 		$ts->modify('+' . $this->count . ' ' . $m);

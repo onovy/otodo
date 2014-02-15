@@ -126,11 +126,9 @@ class Gui {
 						$m = 'month';
 					break;
 					case 'w':
-					case 't':
 						$m = 'week';
 					break;
 					case 'y':
-					case 'r':
 						$m = 'year';
 					break;
 					default:
