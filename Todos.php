@@ -214,6 +214,5 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		} else {
 			return 0;
 		}
-
 	}
 }

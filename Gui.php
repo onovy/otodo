@@ -419,6 +419,7 @@ class Gui {
 				case 'a':
 					$count = $this->todos->archive();
 					if ($count) {
+						$this->todos->sort($this->sort);
 						$this->notice($count . ' todo(s) archived');
 					} else {
 						$this->notice('No todos to archive');
