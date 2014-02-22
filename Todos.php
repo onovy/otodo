@@ -215,4 +215,51 @@ class Todos implements Iterator, ArrayAccess, Countable {
 			return 0;
 		}
 	}
+
+	public function searchSimilar($todo) {
+		assert($todo instanceof Todo);
+
+		$limit = Config::$config['core']['similar_limit'];
+		$max = 0;
+		$sTodo = null;
+
+		$text1 = '';
+		$end = '';
+		$tokens = explode(' ', $todo->text);
+		foreach ($tokens as $token) {
+			if ($token[0] == '+' || $token[0] == '@') {
+				$end .= $token . ' ';
+				continue;
+			}
+			$text1 .= $token . ' ';
+		}
+		$text1 .= $end;
+		$text1 = trim($text1);
+		$text1 = strtolower($text1);
+
+		foreach ($this->todos as $todo2) {
+			$text2 = '';
+			$end = '';
+			$tokens = explode(' ', $todo2->text);
+			foreach ($tokens as $token) {
+				if ($token[0] == '+' || $token[0] == '@') {
+					$end .= $token . ' ';
+					continue;
+				}
+				$text2 .= $token . ' ';
+			}
+			$text2 .= $end;
+			$text2 = trim($text2);
+			$text2 = strtolower($text2);
+
+			$perc = 0;
+			similar_text($text1, $text2, $perc);
+			if ($perc >= $limit && $perc > $max) {
+				$max = $perc;
+				$sTodo = $todo2;
+			}
+		}
+
+		return $sTodo;
+	}
 }

@@ -378,6 +378,17 @@ class Gui {
 						$t = new TodoEx($this->todos);
 						$t->text = $text;
 						$t->creationDate = new DateTime('today');
+						// Detect duplicity
+						$dup = $this->todos->searchSimilar($t);
+						if ($dup) {
+							echo 'Duplicity found: ' . $dup->text . PHP_EOL;
+							$confirm = trim(readline('Really add? '));
+							if ($confirm !== 'y') {
+								$this->error('Todo not added');
+								break;
+							}
+						}
+
 						$this->todos[] = $t;
 						$this->lastLineNumber = array_pop($this->todos->array_keys());
 						$this->notice('Todo added');
