@@ -244,7 +244,22 @@ class Gui {
 				$this->filteredTodos = $this->todos;
 			} else {
 				$this->filteredTodos = $this->todos->array_filter(function($todo) use ($search) {
-					return stripos($todo->text, $search) !== false;
+					foreach ($search as $s) {
+						if ($s['not'] && stripos($todo->text, $s['text']) !== false) {
+							return false;
+						}
+					}
+					foreach ($search as $s) {
+						if (!$s['not'] && stripos($todo->text, $s['text']) !== false) {
+							return true;
+						}
+					}
+					foreach ($search as $s) {
+						if (!$s['not']) {
+							return false;
+						}
+					}
+					return true;
 				});
 			}
 
@@ -355,7 +370,19 @@ class Gui {
 			echo PHP_EOL;
 			echo '/  Search';
 			if ($this->search !== null) {
-				echo ': ' . $this->search;
+				echo ': ';
+				$first = true;
+				foreach ($this->search as $s) {
+					if ($first) {
+						$first = false;
+					} else {
+						echo ', ';
+					}
+					if ($s['not']) {
+						echo '!';
+					}
+					echo $s['text'];
+				}
 			}
 			echo PHP_EOL;
 			echo 'q  Quit' . PHP_EOL;
@@ -532,12 +559,24 @@ class Gui {
 				case '/':
 					$search = trim(substr($cmd, 1));
 					if (empty($search)) {
-						$search = trim(readline('Text: '));
+						$search = trim(readline('Search: '));
 					}
 					if ($search === '') {
 						$this->search = null;
 					} else {
-						$this->search = $search;
+						$search = explode(',', $search);
+						$this->search = array();
+						foreach ($search as $w) {
+							$not = false;
+							if ($w[0] === '!') {
+								$w = substr($w, 1);
+								$not = true;
+							}
+							$this->search[] = array(
+								'not' => $not,
+								'text' => trim($w)
+							);
+						}
 					}
 				break;
 
