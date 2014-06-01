@@ -18,11 +18,14 @@ You should have received a copy of the GNU General Public License
 along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+mb_internal_encoding('UTF-8');
+
 require_once dirname(__FILE__) . '/Exception.php';
 require_once dirname(__FILE__) . '/Todos.php';
 require_once dirname(__FILE__) . '/Todo.php';
 require_once dirname(__FILE__) . '/Recurrent.php';
 require_once dirname(__FILE__) . '/Gui.php';
+require_once dirname(__FILE__) . '/ReadLine.php';
 require_once dirname(__FILE__) . '/Config.php';
 
 // My addons

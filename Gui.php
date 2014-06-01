@@ -26,6 +26,7 @@ class Gui {
 	private $message = '';
 	private $lastLineNumber = null;
 	private $search = null;
+	private $readLine = null;
 
 	public function __construct() {
 		$this->load();
@@ -161,7 +162,7 @@ class Gui {
 			} else if (count($this->filteredTodos) == 1) {
 				$num = array_pop(array_keys($this->filteredTodos));
 			} else {
-				$num = readline('Num: ');
+				$num = $this->readLine->read('Num: ');
 			}
 		}
 		if (!is_numeric($num)) {
@@ -202,23 +203,27 @@ class Gui {
 		return $out;
 	}
 
-	protected function readlineCompletion($input, $index) {
+	protected function readlineCompletion($search) {
 		$out = array();
-		$search = $input;
+
 		$prep = '';
-		while (strlen($search) && in_array($search[0], array('+', '@', '/'))) {
+		while (strlen($search) && !in_array($search[0], array('+', '@'))) {
 			$prep .= $search[0];
 			$search = substr($search, 1);
 		}
+		if (empty($search)) {
+			return array();
+		}
+
 		foreach ($this->todos as $todo) {
 			foreach ($todo->projects as $project) {
-				if (substr($project, 0, strlen($search)) == $search) {
-					$out[] = $prep . $project;
+				if ('+' . substr($project, 0, strlen($search) - 1) == $search) {
+					$out[] = $prep . '+' . $project;
 				}
 			}
 			foreach ($todo->contexts as $context) {
-				if (substr($context, 0, strlen($search)) == $search) {
-					$out[] = $prep . $context;
+				if ('@' . substr($context, 0, strlen($search) - 1) == $search) {
+					$out[] = $prep . '@' . $context;
 				}
 			}
 		}
@@ -226,16 +231,17 @@ class Gui {
 	}
 
 	public function start() {
-		readline_completion_function(function($input, $index) {
-			return $this->readlineCompletion($input, $index);
+		$this->readLine = new ReadLine();
+		$this->readLine->setCompletitionCallback(function($input) {
+			return $this->readlineCompletion($input);
 		});
-		readline_read_history(Config::$config['gui']['history_file']);
+		$this->readLine->historyLoad(Config::$config['gui']['history_file']);
 
 		$this->todos->sort($this->sort);
 		while (true) {
 			$this->save();
 			$this->backup();
-			readline_write_history(Config::$config['gui']['history_file']);
+			$this->readLine->historySave(Config::$config['gui']['history_file']);
 
 			$this->todos->asort($this->sort);
 
@@ -386,18 +392,17 @@ class Gui {
 			}
 			echo PHP_EOL;
 			echo 'q  Quit' . PHP_EOL;
-			$cmd = readline('> ');
-			$cmd = trim($cmd);
+			$cmd = $this->readLine->read('> ');
+			$this->readLine->historyAdd($cmd);
 			if ($cmd === '' || $cmd === false) {
 				continue;
 			}
-			readline_add_history($cmd);
 			switch ($cmd[0]) {
 				// Create new task
 				case 'c':
 					$text = trim(substr($cmd, 1));
 					if (empty($text)) {
-						$text = trim(readline('Text: '));
+						$text = $this->readLine->read('Text: ');
 					}
 					if ($text == '') {
 						$this->error('Need text');
@@ -409,7 +414,7 @@ class Gui {
 						$dup = $this->todos->searchSimilar($t);
 						if ($dup) {
 							echo 'Duplicity found: ' . $dup->text . PHP_EOL;
-							$confirm = trim(readline('Really add? '));
+							$confirm = $this->readLine->read('Really add (y/n)? ', 'y');
 							if ($confirm !== 'y') {
 								$this->error('Todo not added');
 								break;
@@ -428,8 +433,7 @@ class Gui {
 					if ($num === null) {
 						break;
 					}
-					readline_add_history($this->todos[$num]->text);
-					$text = trim(readline('Text: '));
+					$text = $this->readLine->read('Text: ', $this->todos[$num]->text);
 					if ($text === '' || $text === false) {
 						$this->error('Need text');
 					} else {
@@ -444,7 +448,7 @@ class Gui {
 					if ($num === null) {
 						break;
 					}
-					$confirm = trim(readline('Do you really want to remove todo ' . $num .' (y/n)? '));
+					$confirm = $this->readLine->read('Do you really want to remove todo ' . $num .' (y/n)? ', 'y');
 					if ($confirm === 'y') {
 						unset($this->todos[$num]);
 						$this->notice('Todo ' . $num . ' removed');
@@ -490,10 +494,11 @@ class Gui {
 					if ($num === null) {
 						break;
 					}
+					$due = null;
 					if ($this->todos[$num]->due) {
-						readline_add_history($this->todos[$num]->due->format(Config::$config['gui']['date_format_out']));
+						$due = $this->todos[$num]->due->format(Config::$config['gui']['date_format_out']);
 					}
-					$str = trim(readline('Due date: '));
+					$str = $this->readLine->read('Due date: ', $due);
 					if ($str === '' || $str === false) {
 						break;
 					}
@@ -522,10 +527,11 @@ class Gui {
 					if ($num === null) {
 						break;
 					}
+					$recurrent = null;
 					if ($this->todos[$num]->recurrent) {
-						readline_add_history($this->todos[$num]->recurrent->toString());
+						$recurrent = $this->todos[$num]->recurrent->toString();
 					}
-					$str = trim(readline('Recurrent: '));
+					$str = $this->readLine->read('Recurrent: ', $recurrent);
 					if ($str === '' || $str === false) {
 						break;
 					}
@@ -559,7 +565,7 @@ class Gui {
 				case '/':
 					$search = trim(substr($cmd, 1));
 					if (empty($search)) {
-						$search = trim(readline('Search: '));
+						$search = $this->readLine->read('Search: ');
 					}
 					if ($search === '') {
 						$this->search = null;
@@ -586,10 +592,7 @@ class Gui {
 					if ($num === null) {
 						break;
 					}
-					if ($this->todos[$num]->priority) {
-						readline_add_history($this->todos[$num]->priority);
-					}
-					$str = trim(readline('Priority: '));
+					$str = $this->readLine->read('Priority: ', $this->todos[$num]->priority);
 					if ($str === '' || $str === false) {
 						break;
 					}
