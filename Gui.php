@@ -118,8 +118,10 @@ class Gui {
 			if ($date == '') {
 				$dt = new DateTime('today');
 			} elseif (preg_match('/^\+?(\d+)(d|m|w|y)?$/', $date, $matches)) {
+				if (!isset($matches[2])) {
+					$matches[2] = 'd';
+				}
 				switch ($matches[2]) {
-					case '':
 					case 'd':
 						$m = 'day';
 					break;
