@@ -104,6 +104,7 @@ class Gui {
 
 	protected function save() {
 		$this->todos->saveToFile(Config::$config['core']['todo_file']);
+		$this->backup();
 	}
 
 	protected function backup() {
@@ -347,9 +348,6 @@ class Gui {
 		echo "\033c";
 		while (true) {
 			$this->save();
-			$this->backup();
-			$this->readLine->historySave(Config::$config['gui']['history_file']);
-
 			$this->todos->asort($this->sort);
 
 			$search = $this->search;
@@ -526,6 +524,7 @@ class Gui {
 				continue;
 			}
 			$this->readLine->historyAdd($cmd);
+			$this->readLine->historySave(Config::$config['gui']['history_file']);
 			if ($cmd === '' || $cmd === false) {
 				continue;
 			}
@@ -558,6 +557,7 @@ class Gui {
 
 						$this->todos[] = $t;
 						$this->lastLineNumber = array_pop($this->todos->array_keys());
+						$this->save();
 						$this->notice('Todo added');
 					}
 				break;
@@ -573,8 +573,9 @@ class Gui {
 						$this->error('Need text');
 					} else {
 						$this->todos[$num]->text = $text;
+						$this->save();
+						$this->notice('Todo ' . $num . ' changed');
 					}
-					$this->notice('Todo ' . $num . ' changed');
 				break;
 
 				// Remove task
@@ -586,6 +587,7 @@ class Gui {
 					$confirm = $this->readLine->read('Do you really want to remove todo ' . $num .' (y/n)? ', 'y');
 					if ($confirm === 'y') {
 						unset($this->todos[$num]);
+						$this->save();
 						$this->notice('Todo ' . $num . ' removed');
 					} else {
 						$this->error('Todo ' . $num . ' NOT removed');
@@ -597,6 +599,7 @@ class Gui {
 					$count = $this->todos->archive(Config::$config['core']['archive_file']);
 					if ($count) {
 						$this->todos->sort($this->sort);
+						$this->save();
 						$this->notice($count . ' todo(s) archived');
 					} else {
 						$this->notice('No todos to archive');
@@ -610,6 +613,7 @@ class Gui {
 						break;
 					}
 					$this->todos[$num]->markDone();
+					$this->save();
 					$this->notice('Todo ' . $num . ' marked done');
 				break;
 
@@ -620,6 +624,7 @@ class Gui {
 						break;
 					}
 					$this->todos[$num]->unmarkDone();
+					$this->save();
 					$this->notice('Todo ' . $num . ' unmarked done');
 				break;
 
@@ -635,14 +640,18 @@ class Gui {
 					}
 					$str = $this->readLine->read('Due date: ', $due);
 					if ($str === '' || $str === false) {
-						break;
-					}
-					try {
-						$dt = $this->parseDate($str);
-						$this->todos[$num]->due = $dt;
-						$this->notice('Due date set to ' . $dt->format('Y-m-d') . ' for todo ' . $num);
-					} catch (DateParseException $dpe) {
-						$this->error('Don\'t understand ' . $str);
+						$this->todos[$num]->due = null;
+						$this->save();
+						$this->notice('Due date unset for todo ' . $num);
+					} else {
+						try {
+							$dt = $this->parseDate($str);
+							$this->todos[$num]->due = $dt;
+							$this->save();
+							$this->notice('Due date set to ' . $dt->format('Y-m-d') . ' for todo ' . $num);
+						} catch (DateParseException $dpe) {
+							$this->error('Don\'t understand ' . $str);
+						}
 					}
 				break;
 
@@ -653,6 +662,7 @@ class Gui {
 						break;
 					}
 					$this->todos[$num]->due = null;
+					$this->save();
 					$this->notice('Due date unset for todo ' . $num);
 				break;
 
@@ -668,14 +678,18 @@ class Gui {
 					}
 					$str = $this->readLine->read('Recurrent: ', $recurrent);
 					if ($str === '' || $str === false) {
-						break;
-					}
-					try {
-						$r = new Recurrent($str);
-						$this->todos[$num]->recurrent = $r;
-						$this->notice('Todo ' . $num . ' set recurrent ' . $r->toString());
-					} catch (RecurrentParseException $rpe) {
-						$this->error('Don\'t understand ' . $str);
+						$this->todos[$num]->recurrent = null;
+						$this->save();
+						$this->notice('Todo ' . $num . ' set not recurrent');
+					} else {
+						try {
+							$r = new Recurrent($str);
+							$this->todos[$num]->recurrent = $r;
+							$this->save();
+							$this->notice('Todo ' . $num . ' set recurrent ' . $r->toString());
+						} catch (RecurrentParseException $rpe) {
+							$this->error('Don\'t understand ' . $str);
+						}
 					}
 				break;
 
@@ -686,6 +700,7 @@ class Gui {
 						break;
 					}
 					$this->todos[$num]->recurrent = null;
+					$this->save();
 					$this->notice('Todo ' . $num . ' set not recurrent');
 				break;
 
@@ -729,11 +744,14 @@ class Gui {
 					}
 					$str = $this->readLine->read('Priority: ', $this->todos[$num]->priority);
 					if ($str === '' || $str === false) {
-						break;
-					}
-
-					if (preg_match('/^[a-zA-Z]$/', $str)) {
-						$this->todos[$num]->priority = strtoupper($str);
+						$this->notice('Priority unset for todo ' . $num);
+						$this->todos[$num]->priority = null;
+						$this->save();
+					} else if (preg_match('/^[a-zA-Z]$/', $str)) {
+						$prio = strtoupper($str);
+						$this->todos[$num]->priority = $prio;
+						$this->save();
+						$this->notice('Priority set to ' . $prio . ' for todo ' . $num);
 					} else {
 						$this->error('Wrong priority ' . $str);
 					}
@@ -746,6 +764,8 @@ class Gui {
 						break;
 					}
 					$this->todos[$num]->priority = null;
+					$this->save();
+					$this->notice('Priority unset for todo ' . $num);
 				break;
 
 				// Quit
