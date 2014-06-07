@@ -330,9 +330,6 @@ class Gui {
 	}
 
 	public function start() {
-		// Clear screen
-		echo "\033c";
-
 		$this->readLine = new ReadLine();
 		$this->readLine->setCompletitionCallback(function($input) {
 			return $this->readlineCompletion($input);
