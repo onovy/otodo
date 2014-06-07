@@ -330,6 +330,9 @@ class Gui {
 	}
 
 	public function start() {
+		// Clear screen
+		echo "\033c";
+
 		$this->readLine = new ReadLine();
 		$this->readLine->setCompletitionCallback(function($input) {
 			return $this->readlineCompletion($input);
@@ -342,6 +345,9 @@ class Gui {
 		}
 
 		$this->todos->sort($this->sort);
+
+		// Clear screen
+		echo "\033c";
 		while (true) {
 			$this->save();
 			$this->backup();
@@ -397,12 +403,15 @@ class Gui {
 				}
 			}
 
-			// Clear screen
-			echo "\033c";
+			// Got to the begging of screen
+			echo "\033[0;0H";
 
 			// Show columns title
 			$first = true;
 			foreach ($columns as $column) {
+				// Clear line
+				echo "\033[K";
+
 				if ($first) {
 					$first = false;
 				} else {
@@ -422,6 +431,9 @@ class Gui {
 			// Show todos
 			$pos = 0;
 			foreach ($this->filteredTodos as $k=>$todo) {
+				// Clear line
+				echo "\033[K";
+
 				if ($pos++ % 2 == 0) {
 					echo $this->config2color(Config::$config['color']['todo_odd']);
 				} else {
@@ -463,10 +475,13 @@ class Gui {
 				echo PHP_EOL;
 
 				if (isset(Config::$config['gui']['max_todos']) && $pos >= Config::$config['gui']['max_todos']) {
-					echo '...' . PHP_EOL;
+					echo "\033[K..." . PHP_EOL;
 					break;
 				}
 			}
+
+			// Clear rest of screen
+			echo "\033[0J";
 
 			echo PHP_EOL;
 			echo $this->message . PHP_EOL;
