@@ -21,6 +21,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 class Todos implements Iterator, ArrayAccess, Countable {
 	private $todos = array();
 	protected $CLASS = 'Todo';
+	private $currentId = 0;
 
 	public function loadFromFile($filename) {
 		$f = @fopen($filename, 'r');
@@ -34,7 +35,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		while (($line = fgets($f)) !== false) {
 			$t = new $this->CLASS($this);
 			$t->fillFromString($line);
-			$this->todos[] = $t;
+			$this->offsetSet(null, $t);
 		}
 
 		fclose($f);
@@ -91,6 +92,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 	}
 
 	public function offsetSet($offset, $value) {
+		$value->id = $this->currentId++;
 		if ($offset === null) {
 			$this->todos[] = $value;
 		} else {
@@ -182,7 +184,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $cmp;
 				}
 			}
-			return 0;
+			return $a->id > $b->id;
 		});
 	}
 
@@ -194,7 +196,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $cmp;
 				}
 			}
-			return 0;
+			return $a->id > $b->id;
 		});
 	}
 

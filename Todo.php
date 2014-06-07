@@ -19,6 +19,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 class Todo {
+	public $id;
 	public $done = false;
 	public $doneDate;
 	public $priority;
