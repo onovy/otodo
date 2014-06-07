@@ -20,6 +20,13 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 mb_internal_encoding('UTF-8');
 
+function mb_str_pad ($input, $pad_length, $pad_string, $pad_type, $encoding = null) {
+	if (is_null($encoding)) {
+		$encoding = mb_internal_encoding();
+	}
+	return str_pad($input, strlen($input) - mb_strlen($input, $encoding) + $pad_length, $pad_string, $pad_type);
+}
+
 require_once dirname(__FILE__) . '/Exception.php';
 require_once dirname(__FILE__) . '/Todos.php';
 require_once dirname(__FILE__) . '/Todo.php';

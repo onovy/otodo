@@ -27,6 +27,58 @@ class Gui {
 	private $lastLineNumber = null;
 	private $search = null;
 	private $readLine = null;
+	private $columns = array(
+		'num' => array(
+			'title' => '#',
+			'padTitle' => STR_PAD_BOTH,
+			'padValue' => STR_PAD_LEFT
+		),
+		'done' => array(
+			'title' => 'D',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'doneDate' => array(
+			'title' => 'Done date',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'priority' => array(
+			'title' => 'P',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'creationDate' => array(
+			'title' => 'Created',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'text' => array(
+			'title' => 'Text',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'due' => array(
+			'title' => 'Due date',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'recurrent' => array(
+			'title' => 'Recu.',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'projects' => array(
+			'title' => 'Projects',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+		'contexts' => array(
+			'title' => 'Contexts',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
+	);
 
 	public function __construct() {
 		$this->load();
@@ -240,6 +292,43 @@ class Gui {
 		return array_unique($out);
 	}
 
+	protected function columnValue($k, $column) {
+		$todo = $this->todos[$k];
+
+		$val = '';
+		switch ($column) {
+			case 'num':
+				$val = $k;
+			break;
+			case 'done':
+				if ($todo->done) {
+					$val = 'X';
+				}
+			break;
+			case 'due':
+			case 'creationDate':
+			case 'doneDate':
+				if ($todo->$column) {
+					$val = $todo->$column->format(Config::$config['gui']['date_format_out']);
+				}
+			break;
+			case 'recurrent':
+				if ($todo->recurrent) {
+					$val = $todo->recurrent->toString();
+				}
+			break;
+			case 'projects':
+			case 'contexts':
+				$val = implode(', ', $todo->$column);
+			break;
+			case 'text':
+			case 'priority':
+				$val = (string) $todo->$column;
+			break;
+		}
+		return $val;
+	}
+
 	public function start() {
 		$this->readLine = new ReadLine();
 		$this->readLine->setCompletitionCallback(function($input) {
@@ -284,27 +373,53 @@ class Gui {
 				});
 			}
 
-			$textLen = 0;
+			// Detect max length of every column
+			$columns = Config::$config['gui']['columns'];
+			$lengths = array();
+			foreach ($columns as $column) {
+				if (!isset($this->columns[$column])) {
+					echo 'Unknow column: ' . $column . ', check configuration gui.columns!' . PHP_EOL;
+					exit(-1);
+				}
+				$lengths[$column] = mb_strlen($this->columns[$column]['title']);
+			}
 			$pos = 0;
-			foreach ($this->filteredTodos as $todo) {
+			foreach ($this->filteredTodos as $k=>$todo) {
 				$pos++;
-				if (strlen($todo->text) > $textLen) {
-					$textLen = strlen($todo->text);
+				foreach ($columns as $column) {
+					$len = mb_strlen($this->columnValue($k, $column));
+					if ($len > $lengths[$column]) {
+						$lengths[$column] = $len;
+					}
 				}
 				if (isset(Config::$config['gui']['max_todos']) && $pos >= Config::$config['gui']['max_todos']) {
 					break;
 				}
 			}
 
+			// Clear screen
 			echo "\033c";
-			echo str_pad('#', 3, ' ', STR_PAD_LEFT) . ' | ';
-			echo 'D?| ';
-			echo 'P | ';
-			echo str_pad('Text', $textLen) . ' | ';
-			echo str_pad('Due date', 12) . ' | ';
-			echo str_pad('Recu.', 5);
+
+			// Show columns title
+			$first = true;
+			foreach ($columns as $column) {
+				if ($first) {
+					$first = false;
+				} else {
+					echo '|';
+				}
+				echo $this->config2color(Config::$config['color']['title']);
+				echo ' ' . mb_str_pad(
+						$this->columns[$column]['title'],
+						$lengths[$column],
+						' ',
+						$this->columns[$column]['padTitle']
+					) . ' ';
+				echo $this->config2color(Config::$config['color']['default']);
+			}
 			echo PHP_EOL;
 
+			// Show todos
 			$pos = 0;
 			foreach ($this->filteredTodos as $k=>$todo) {
 				if ($pos++ % 2 == 0) {
@@ -329,31 +444,19 @@ class Gui {
 					}
 				}
 
-				echo str_pad($k, 3, ' ', STR_PAD_LEFT) . ' | ';
-				if ($todo->done) {
-					echo 'X';
-				} else {
-					echo ' ';
-				}
-				echo ' | ';
-				if ($todo->priority) {
-					echo $todo->priority;
-				} else {
-					echo ' ';
-				}
-				echo ' | ';
-				echo str_pad($todo->text, $textLen);
-				echo ' | ';
-				if ($todo->due) {
-					echo str_pad($todo->due->format(Config::$config['gui']['date_format_out']), 12);
-				} else {
-					echo str_pad('', 12);
-				}
-				echo ' | ';
-				if ($todo->recurrent) {
-					echo str_pad($todo->recurrent->toString(), 5);
-				} else {
-					echo str_pad('', 5);
+				$first = true;
+				foreach ($columns as $column) {
+					if ($first) {
+						$first = false;
+					} else {
+						echo '|';
+					}
+					echo ' ' . mb_str_pad(
+							$this->columnValue($k, $column),
+							$lengths[$column],
+							' ',
+							$this->columns[$column]['padValue']
+						) . ' ';
 				}
 
 				echo $this->config2color(Config::$config['color']['default']);
