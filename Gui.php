@@ -347,7 +347,6 @@ class Gui {
 		// Clear screen
 		echo "\033c";
 		while (true) {
-			$this->save();
 			$this->todos->asort($this->sort);
 
 			$search = $this->search;
