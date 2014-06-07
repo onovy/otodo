@@ -33,6 +33,7 @@ class ReadLine {
 	private $pos = 0;
 	private $state = self::INIT;
 	private $prefix = '';
+	public $timeout = false;
 
 	public function setCompletitionCallback($callback) {
 		$this->completitionCallback = $callback;
@@ -69,12 +70,17 @@ class ReadLine {
 		file_put_contents($file, serialize($this->history));
 	}
 
-	public function read($prefix = '', $prefill = '') {
-		$this->historyPos = null;
-		$this->historyNew = null;
+	public function read($prefix = '', $prefill = '', $timeout = null) {
+		if ($timeout && $this->timeout) {
+			$this->timeout = false;
+		} else {
+			$this->historyPos = null;
+			$this->historyNew = null;
+			$this->line = $prefill;
+			$this->pos = strlen($this->line);
+		}
+
 		$this->state = self::READ;
-		$this->line = $prefill;
-		$this->pos = strlen($this->line);
 		$this->prefix = $prefix;
 		$this->repaint();
 		system("stty -icanon -echo");
@@ -82,8 +88,12 @@ class ReadLine {
 			$read = array(STDIN);
 			$write = array();
 			$except = array();
-			$count = stream_select($read, $write, $except, 10);
+			$count = stream_select($read, $write, $except, $timeout ? $timeout : null);
 			if (!$count) {
+				if ($timeout) {
+					$this->timeout = true;
+					break;
+				}
 				continue;
 			}
 			do {

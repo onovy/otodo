@@ -470,7 +470,6 @@ class Gui {
 
 			echo PHP_EOL;
 			echo $this->message . PHP_EOL;
-			$this->message = '';
 
 			echo 'c  Create             e  Edit' . PHP_EOL;
 			echo 'r  Remove             a  Archive' . PHP_EOL;
@@ -510,11 +509,17 @@ class Gui {
 			}
 			echo PHP_EOL;
 			echo 'q  Quit' . PHP_EOL;
-			$cmd = $this->readLine->read('> ');
+			$cmd = $this->readLine->read('> ', '', Config::$config['gui']['reload_timeout']);
+			if ($this->readLine->timeout) {
+				continue;
+			}
 			$this->readLine->historyAdd($cmd);
 			if ($cmd === '' || $cmd === false) {
 				continue;
 			}
+
+			$this->message = '';
+
 			switch ($cmd[0]) {
 				// Create new task
 				case 'c':
