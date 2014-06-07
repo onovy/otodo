@@ -148,6 +148,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 				}
 			break;
 			case 'creationDate':
+			case 'doneDate':
 				if ($a->$col === null) {
 					if ($b->$col === null) {
 						return 0;
