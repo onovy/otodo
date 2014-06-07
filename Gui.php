@@ -38,8 +38,16 @@ class Gui {
 	}
 
 	protected function load() {
-		$this->todos = new TodosEx();
-		$this->todos->loadFromFile(Config::$config['core']['todo_file']);
+		try {
+			$this->todos = new TodosEx();
+			$this->todos->loadFromFile(Config::$config['core']['todo_file']);
+		} catch (TodosLoadException $tle) {
+			// File doesn't exists or isn't readable,
+			// ignore it, but inform user
+			$this->error($tle->getMessage());
+			// Create empty todo file
+			touch(Config::$config['core']['todo_file']);
+		}
 	}
 
 	protected function save() {
@@ -237,7 +245,12 @@ class Gui {
 		$this->readLine->setCompletitionCallback(function($input) {
 			return $this->readlineCompletion($input);
 		});
-		$this->readLine->historyLoad(Config::$config['gui']['history_file']);
+		try {
+			$this->readLine->historyLoad(Config::$config['gui']['history_file']);
+		} catch (HistoryLoadException $hle) {
+			echo $hle->getMessage() . PHP_EOL;
+			exit(-1);
+		}
 
 		$this->todos->sort($this->sort);
 		while (true) {

@@ -51,7 +51,18 @@ class ReadLine {
 	}
 
 	public function historyLoad($file) {
-		$this->history = unserialize(file_get_contents($file));
+		if (file_exists($file)) {
+			$this->history = @unserialize(file_get_contents($file));
+			if ($this->history === FALSE) {
+				$phpError = error_get_last();
+				throw new HistoryLoadException('Can\'t load history file: ' .
+					$phpError['message']);
+			} elseif (!is_array($this->history)) {
+				throw new HistoryLoadException('Can\'t load history file: Wrong format');
+			}
+		} else {
+			$this->history = array();
+		}
 	}
 
 	public function historySave($file) {

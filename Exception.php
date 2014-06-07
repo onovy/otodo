@@ -21,3 +21,6 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 class TodoException extends Exception {}
 class RecurrentParseException extends TodoException {}
 class DateParseException extends TodoException {}
+class ConfigLoadException extends TodoException {}
+class HistoryLoadException extends TodoException {}
+class TodosLoadException extends TodoException {}

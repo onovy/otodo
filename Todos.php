@@ -23,7 +23,12 @@ class Todos implements Iterator, ArrayAccess, Countable {
 	protected $CLASS = 'Todo';
 
 	public function loadFromFile($filename) {
-		$f = fopen($filename, 'r');
+		$f = @fopen($filename, 'r');
+		if ($f === FALSE) {
+			$phpError = error_get_last();
+			throw new TodosLoadException('Can\'t load todo file: ' .
+				$phpError['message']);
+		}
 
 		$this->todos = array();
 		while (($line = fgets($f)) !== false) {

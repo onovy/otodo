@@ -22,7 +22,12 @@ class Config {
 	public static $config;
 
 	public static function loadFile($filename) {
-		$ini = parse_ini_file($filename, true);
+		$ini = @parse_ini_file($filename, true);
+		if ($ini === FALSE) {
+			$phpError = error_get_last();
+			throw new ConfigLoadException('Can\'t load config file: ' .
+				$phpError['message']);
+		}
 		self::$config = $ini;
 	}
 }

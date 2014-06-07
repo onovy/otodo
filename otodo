@@ -27,7 +27,12 @@ if ($argc == 2) {
 } else {
 	$configFile = dirname(__FILE__) . '/config.ini';
 }
-Config::loadFile($configFile);
+try {
+	Config::loadFile($configFile);
+} catch (ConfigLoadException $cle) {
+	echo $cle->getMessage() . PHP_EOL;
+	exit(-1);
+}
 
 $g = new Gui();
 $g->start();
