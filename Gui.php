@@ -474,7 +474,7 @@ class Gui {
 
 				// Archive
 				case 'a':
-					$count = $this->todos->archive();
+					$count = $this->todos->archive(Config::$config['core']['archive_file']);
 					if ($count) {
 						$this->todos->sort($this->sort);
 						$this->notice($count . ' todo(s) archived');

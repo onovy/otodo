@@ -198,9 +198,10 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		});
 	}
 
-	public function archive() {
-		$archive = Config::$config['core']['archive_file'];
-
+	public function archive($archive) {
+		if (!file_exists($archive)) {
+			touch($archive);
+		}
 		$ta = new TodosEx();
 		$ta->loadFromFile($archive);
 		$unset = array();
