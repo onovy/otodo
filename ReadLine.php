@@ -175,6 +175,12 @@ class ReadLine {
 						case "\033":
 							$this->state = self::ESC_033;
 						break;
+						case "\001": // Ctrl+A
+							$this->pos = 0;
+						break;
+						case "\005": // Ctrl+E
+							$this->pos = mb_strlen($this->line);
+						break;
 						default:
 							if ($this->pos == mb_strlen($this->line)) {
 								$this->line .= $ch;
