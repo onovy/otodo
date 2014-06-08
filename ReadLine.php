@@ -182,6 +182,9 @@ class ReadLine {
 							$this->pos = mb_strlen($this->line);
 						break;
 						default:
+							if (strlen($ch) == 1 && (ord($ch) < 32 || ord($ch) > 126)) {
+								break;
+							}
 							if ($this->pos == mb_strlen($this->line)) {
 								$this->line .= $ch;
 							} else {
