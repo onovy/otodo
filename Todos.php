@@ -32,6 +32,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		}
 
 		$this->todos = array();
+		$this->currentId = 0;
 		while (($line = fgets($f)) !== false) {
 			$t = new $this->CLASS($this);
 			$t->fillFromString($line);
@@ -44,7 +45,9 @@ class Todos implements Iterator, ArrayAccess, Countable {
 	public function saveToFile($filename) {
 		$f = fopen($filename, 'w');
 
-		foreach ($this->todos as $todo) {
+		$copy = clone $this;
+		$copy->sort(array('id' => true));
+		foreach ($copy as $todo) {
 			fputs($f, $todo->generateString() . PHP_EOL);
 		}
 
@@ -167,6 +170,16 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $asc ? -1 : 1;
 				}
 			break;
+			case 'id':
+				if ($a->$col === $b->$col) {
+					return 0;
+				}
+				if ($a->$col > $b->$col) {
+					return $asc ? 1 : -1;
+				} else {
+					return $asc ? -1 : 1;
+				}
+			break;
 			default:
 				$trace = debug_backtrace();
 				trigger_error (
@@ -185,7 +198,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $cmp;
 				}
 			}
-			return $a->id > $b->id;
+			return static::sortCmp('id', false, $a, $b);
 		});
 	}
 
@@ -197,7 +210,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $cmp;
 				}
 			}
-			return $a->id > $b->id;
+			return static::sortCmp('id', false, $a, $b);
 		});
 	}
 
