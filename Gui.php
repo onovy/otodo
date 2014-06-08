@@ -78,6 +78,11 @@ class Gui {
 			'padTitle' => STR_PAD_RIGHT,
 			'padValue' => STR_PAD_RIGHT
 		),
+		'id' => array(
+			'title' => 'ID',
+			'padTitle' => STR_PAD_RIGHT,
+			'padValue' => STR_PAD_RIGHT
+		),
 	);
 
 	public function __construct() {
@@ -324,6 +329,7 @@ class Gui {
 			break;
 			case 'text':
 			case 'priority':
+			case 'id':
 				$val = (string) $todo->$column;
 			break;
 		}
