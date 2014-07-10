@@ -1,4 +1,4 @@
-# otodo #
+a# otodo #
 
 Powerfull TUI for todo.txt.
 
