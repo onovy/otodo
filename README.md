@@ -1,6 +1,8 @@
-a# otodo #
+# otodo #
 
 Powerfull TUI for todo.txt.
+
+![Screenshot](https://raw.githubusercontent.com/onovy/otodo/master/screenshot.png "Screenshot")
 
 ## Requirements ##
 otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 5.4, but it should work on older version. No extension is requred. It should work on almost any Unix-like system, tested on Mac OS X.
