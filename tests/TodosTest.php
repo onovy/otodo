@@ -33,6 +33,21 @@ class TodosTest extends PHPUnit_Framework_TestCase {
 	public function testSort() {
 		$ts = new Todos();
 		$ts->loadFromFile('todo.txt');
+		$ts->sort(array(
+			'done' => true,
+			'priority' => false,
+			'text' => false,
+		));
+		$ids = array();
+		foreach ($ts as $t) {
+			$ids[] = $t->id;
+		}
+		$this->assertEquals($ids, array(4, 1, 3, 7, 9, 0, 6, 2, 8, 5));
+	}
+
+	public function testSortPersistent() {
+		$ts = new Todos();
+		$ts->loadFromFile('todo.txt');
 		$file = tempnam(sys_get_temp_dir(), 'otodo');
 		$ts->sort(array(
 			'done' => true,
@@ -40,7 +55,21 @@ class TodosTest extends PHPUnit_Framework_TestCase {
 			'text' => false,
 		));
 		$ts->saveToFile($file);
-		$this->assertEquals(sha1_file('todo.sort.txt'), sha1_file($file));
+		$this->assertEquals(sha1_file('todo.txt'), sha1_file($file));
+		unlink($file);
+	}
+
+	public function testASortPersistent() {
+		$ts = new Todos();
+		$ts->loadFromFile('todo.txt');
+		$file = tempnam(sys_get_temp_dir(), 'otodo');
+		$ts->asort(array(
+			'done' => true,
+			'priority' => false,
+			'text' => false,
+		));
+		$ts->saveToFile($file);
+		$this->assertEquals(sha1_file('todo.txt'), sha1_file($file));
 		unlink($file);
 	}
 }
