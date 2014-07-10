@@ -569,7 +569,7 @@ class Gui {
 			$this->message = '';
 			$this->readLine->historyAdd($cmd);
 			$this->readLine->historySave(Config::$config['gui']['history_file']);
-			if ($cmd === '' || $cmd === false) {
+			if ($cmd === '') {
 				continue;
 			}
 
@@ -580,7 +580,7 @@ class Gui {
 					if (empty($text)) {
 						$text = $this->readLine->read('Text: ');
 					}
-					if ($text == '') {
+					if ($text === '') {
 						$this->error('Need text');
 					} else {
 						$t = new TodoEx($this->todos);
@@ -612,7 +612,7 @@ class Gui {
 						break;
 					}
 					$text = $this->readLine->read('Text: ', $this->todos[$num]->text);
-					if ($text === '' || $text === false) {
+					if ($text === '') {
 						$this->error('Need text');
 					} else {
 						$this->todos[$num]->text = $text;
@@ -687,7 +687,7 @@ class Gui {
 						$due = $this->todos[$num]->due->format(Config::$config['gui']['date_format_out']);
 					}
 					$str = $this->readLine->read('Due date: ', $due);
-					if ($str === '' || $str === false) {
+					if ($str === '') {
 						$this->todos[$num]->due = null;
 						if ($this->changed()) {
 							$this->notice('Due date unset for todo ' . $num);
@@ -728,7 +728,7 @@ class Gui {
 						$recurrent = $this->todos[$num]->recurrent->toString();
 					}
 					$str = $this->readLine->read('Recurrent: ', $recurrent);
-					if ($str === '' || $str === false) {
+					if ($str === '') {
 						$this->todos[$num]->recurrent = null;
 						if ($this->changed()) {
 							$this->notice('Todo ' . $num . ' set not recurrent');
@@ -797,7 +797,7 @@ class Gui {
 						break;
 					}
 					$str = $this->readLine->read('Priority: ', $this->todos[$num]->priority);
-					if ($str === '' || $str === false) {
+					if ($str === '') {
 						$this->todos[$num]->priority = null;
 						if ($this->changed()) {
 							$this->notice('Priority unset for todo ' . $num);
