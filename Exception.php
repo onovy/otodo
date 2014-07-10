@@ -18,9 +18,9 @@ You should have received a copy of the GNU General Public License
 along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-class TodoException extends Exception {}
-class RecurrentParseException extends TodoException {}
-class DateParseException extends TodoException {}
-class ConfigLoadException extends TodoException {}
-class HistoryLoadException extends TodoException {}
-class TodosLoadException extends TodoException {}
+class OTodoException extends Exception {}
+class RecurrentParseException extends OTodoException {}
+class DateParseException extends OTodoException {}
+class ConfigLoadException extends OTodoException {}
+class HistoryLoadException extends OTodoException {}
+class TodosLoadException extends OTodoException {}
