@@ -47,7 +47,7 @@ class Todo {
 		return $dt;
 	}
 
-	private function clean() {
+	protected function clean() {
 		$this->done = false;
 		$this->doneDate = null;
 		$this->priority = null;
@@ -118,7 +118,7 @@ class Todo {
 			break;
 			default:
 				$trace = debug_backtrace();
-				trigger_error (
+				trigger_error(
 					'Undefined property via __get(): ' . $name .
 					' in ' . $trace[0]['file'] .
 					' on line ' . $trace[0]['line'],

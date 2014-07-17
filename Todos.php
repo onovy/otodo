@@ -181,11 +181,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 				}
 			break;
 			default:
-				$trace = debug_backtrace();
-				trigger_error (
-					'Unknown sorting param: ' . $col,
-					E_USER_ERROR
-				);
+				throw new UnknownSortingParamException('Unknown sorting param: ' . $col);
 			break;
 		}
 	}

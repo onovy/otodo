@@ -23,7 +23,7 @@ class TodoEx extends Todo {
 	private $recurrent;
 	protected $validExtensions = array('due', 'recurrent');
 
-	private function clean() {
+	protected function clean() {
 		parent::clean();
 		$this->due = null;
 		$this->recurrent = null;
@@ -56,6 +56,7 @@ class TodoEx extends Todo {
 				if ($value === null) {
 					unset($this->addons['due']);
 				} else {
+					assert($value instanceof DateTime);
 					$this->addons['due'] = $value->format('Y-m-d');
 				}
 			break;
@@ -64,11 +65,12 @@ class TodoEx extends Todo {
 				if ($value === null) {
 					unset($this->addons['recurrent']);
 				} else {
+					assert($value instanceof Recurrent);
 					$this->addons['recurrent'] = $value->toString();
 				}
 			break;
 			default:
-				return parent::__set($name, $value);
+				parent::__set($name, $value);
 			break;
 		}
 	}

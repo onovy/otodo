@@ -34,8 +34,9 @@ class ReadLine {
 	private $state = self::INIT;
 	private $prefix = '';
 	public $timeout = false;
+	private $completitionCallback = null;
 
-	public function setCompletitionCallback($callback) {
+	public function setCompletitionCallback(callable $callback) {
 		$this->completitionCallback = $callback;
 	}
 
@@ -148,28 +149,30 @@ class ReadLine {
 							}
 						break;
 						case "\t": // Tab
-							$search = mb_substr($this->line, 0, $this->pos);
-							$pos = strrpos($search, ' ');
-							if ($pos !== false) {
-								$search = mb_substr($search, $pos + 1);
-							}
-							$ar = call_user_func($this->completitionCallback, $search);
-							if (count($ar) == 1) {
-								if ($pos === false) {
-									$this->line =
-										$ar[0] .
-										mb_substr($this->line, mb_strlen($search));
-								} else {
-									$this->line =
-										mb_substr($this->line, 0, $pos + 1) .
-										$ar[0] .
-										mb_substr($this->line, $pos + mb_strlen($search) + 1);
+							if (!is_null($this->completitionCallback)) {
+								$search = mb_substr($this->line, 0, $this->pos);
+								$pos = strrpos($search, ' ');
+								if ($pos !== false) {
+									$search = mb_substr($search, $pos + 1);
 								}
-								$this->pos += mb_strlen($ar[0]) - mb_strlen($search);
-							} elseif (count($ar) > 1) {
-								echo PHP_EOL;
-								echo implode(' ', $ar);
-								echo PHP_EOL;
+								$ar = call_user_func($this->completitionCallback, $search);
+								if (count($ar) == 1) {
+									if ($pos === false) {
+										$this->line =
+											$ar[0] .
+											mb_substr($this->line, mb_strlen($search));
+									} else {
+										$this->line =
+											mb_substr($this->line, 0, $pos + 1) .
+											$ar[0] .
+											mb_substr($this->line, $pos + mb_strlen($search) + 1);
+									}
+									$this->pos += mb_strlen($ar[0]) - mb_strlen($search);
+								} elseif (count($ar) > 1) {
+									echo PHP_EOL;
+									echo implode(' ', $ar);
+									echo PHP_EOL;
+								}
 							}
 						break;
 						case "\033":

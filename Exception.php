@@ -24,3 +24,4 @@ class DateParseException extends OTodoException {}
 class ConfigLoadException extends OTodoException {}
 class HistoryLoadException extends OTodoException {}
 class TodosLoadException extends OTodoException {}
+class UnknownSortingParamException extends OTodoException {}

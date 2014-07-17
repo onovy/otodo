@@ -155,7 +155,6 @@ class Gui {
 		$dir = Config::$config['core']['backup_dir'];
 		if ($dir) {
 			$source = Config::$config['core']['todo_file'];
-			$date = date('c');
 			$target =
 				'todo.' .
 				date('c') .
@@ -826,9 +825,7 @@ class Gui {
 				break;
 
 				// Quit
-				case 'e':
 				case 'q':
-				case 'E':
 				case 'Q':
 					exit();
 				break;

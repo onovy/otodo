@@ -70,7 +70,7 @@ class RecurrentTest extends PHPUnit_Framework_TestCase {
 		);
 		foreach ($tests as $test) {
 			try {
-				$r = new Recurrent($test);
+				new Recurrent($test);
 				$this->fail($test . ' should throw exception!');
 			} catch (RecurrentParseException $rpe) {
 				// This is OK
