@@ -35,6 +35,7 @@ class ReadLine {
 	private $prefix = '';
 	public $timeout = false;
 	private $completitionCallback = null;
+	private $completition = '';
 
 	public function setCompletitionCallback(callable $callback) {
 		$this->completitionCallback = $callback;
@@ -79,12 +80,13 @@ class ReadLine {
 			$this->historyNew = null;
 			$this->line = $prefill;
 			$this->pos = strlen($this->line);
+			$this->completition = '';
 		}
 
 		$this->state = self::READ;
 		$this->prefix = $prefix;
 		$this->repaint();
-		system("stty -icanon -echo");
+		system('stty -icanon -echo');
 		while (true) {
 			$read = array(STDIN);
 			$write = array();
@@ -110,14 +112,20 @@ class ReadLine {
 				break;
 			}
 		}
-		system("stty sane");
+		system('stty sane');
 		echo PHP_EOL;
+		echo "\033[K";
 		return trim($this->line);
 	}
 
 	private function repaint() {
+		echo PHP_EOL;
+		echo "\033[K";
+		echo $this->completition;
+		echo "\033[1A";
 		echo "\033[9999D";
 		echo "\033[K";
+
 		echo $this->prefix;
 		echo $this->line;
 		$l = mb_strlen($this->line) - $this->pos;
@@ -156,6 +164,8 @@ class ReadLine {
 									$search = mb_substr($search, $pos + 1);
 								}
 								$ar = call_user_func($this->completitionCallback, $search);
+								$this->completition = null;
+
 								if (count($ar) == 1) {
 									if ($pos === false) {
 										$this->line =
@@ -169,10 +179,9 @@ class ReadLine {
 									}
 									$this->pos += mb_strlen($ar[0]) - mb_strlen($search);
 								} elseif (count($ar) > 1) {
-									echo PHP_EOL;
-									echo implode(' ', $ar);
-									echo PHP_EOL;
+									$this->completition = implode(' ', $ar);
 								}
+
 							}
 						break;
 						case "\033":
