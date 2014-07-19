@@ -32,57 +32,68 @@ class Gui {
 		'num' => array(
 			'title' => '#',
 			'padTitle' => STR_PAD_BOTH,
-			'padValue' => STR_PAD_LEFT
+			'padValue' => STR_PAD_LEFT,
+			'shorten' => false,
 		),
 		'done' => array(
 			'title' => 'D',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 		'doneDate' => array(
 			'title' => 'Done date',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 		'priority' => array(
 			'title' => 'P',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 		'creationDate' => array(
 			'title' => 'Created',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 		'text' => array(
 			'title' => 'Text',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => true,
 		),
 		'due' => array(
 			'title' => 'Due date',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 		'recurrent' => array(
 			'title' => 'Recu.',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 		'projects' => array(
 			'title' => 'Projects',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => true,
 		),
 		'contexts' => array(
 			'title' => 'Contexts',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => true,
 		),
 		'id' => array(
 			'title' => 'ID',
 			'padTitle' => STR_PAD_RIGHT,
-			'padValue' => STR_PAD_RIGHT
+			'padValue' => STR_PAD_RIGHT,
+			'shorten' => false,
 		),
 	);
 
@@ -375,6 +386,41 @@ class Gui {
 		return $val;
 	}
 
+	protected function getTerminalWidth() {
+		$n = exec('tput cols');
+		if (is_numeric($n)) {
+			return (int) $n;
+		}
+		echo 'Can\'t detect terminal width!' . PHP_EOL;
+		exit(-1);
+	}
+
+	protected function getTerminalHeight() {
+		$n = exec('tput lines');
+		if (is_numeric($n)) {
+			return (int) $n;
+		}
+		echo 'Can\'t detect terminal height!' . PHP_EOL;
+		exit(-1);
+	}
+
+	protected function printColumn($value, $length, $pad) {
+		if (mb_strlen($value) > $length) {
+			echo ' ' . mb_substr(
+				$value,
+				0,
+				$length
+			) . '→';
+		} else {
+			echo ' ' . mb_str_pad(
+				$value,
+				$length,
+				' ',
+				$pad
+			) . ' ';
+		}
+	}
+
 	public function start() {
 		$this->readLine = new ReadLine();
 		$this->readLine->setCompletitionCallback(function($input) {
@@ -416,15 +462,26 @@ class Gui {
 				});
 			}
 
+			// Screen height
+			$maxTodos = $this->getTerminalHeight() - 15;
+			if ($maxTodos <= 0) {
+				echo "\033c";
+				echo 'Too small terminal, make it taller' . PHP_EOL;
+				sleep(Config::$config['gui']['reload_timeout']);
+				continue;
+			}
+
 			// Detect max length of every column
 			$columns = Config::$config['gui']['columns'];
 			$lengths = array();
+			$minLengths = array();
 			foreach ($columns as $column) {
 				if (!isset($this->columns[$column])) {
 					echo 'Unknow column: ' . $column . ', check configuration gui.columns!' . PHP_EOL;
 					exit(-1);
 				}
 				$lengths[$column] = mb_strlen($this->columns[$column]['title']);
+				$minLengths[$column] = $lengths[$column];
 			}
 			$pos = 0;
 			foreach ($this->filteredTodos as $k=>$todo) {
@@ -435,8 +492,57 @@ class Gui {
 						$lengths[$column] = $len;
 					}
 				}
-				if (isset(Config::$config['gui']['max_todos']) && $pos >= Config::$config['gui']['max_todos']) {
+				if ($pos >= $maxTodos) {
 					break;
+				}
+			}
+
+			// Screen width
+			$maxWidth = $this->getTerminalWidth();
+			$width = -1;
+			foreach ($lengths as $length) {
+				$width += $length + 3;
+			}
+			$needShorten = $width - $maxWidth;
+			if ($needShorten > 0) {
+				// Try to shorten few columns
+				$posShortens = array();
+				$posShortenSum = 0;
+				foreach ($columns as $column) {
+					if ($this->columns[$column]['shorten'] && $lengths[$column] > $minLengths[$column]) {
+						$posShortens[$column] = $lengths[$column] - $minLengths[$column];
+						$posShortenSum += $posShortens[$column];
+					}
+				}
+				$shortened = 0;
+				foreach ($posShortens as $column=>$posShorten) {
+					$shorten = floor((float) $posShorten / (float) $posShortenSum * (float) $needShorten);
+					$lengths[$column] -= $shorten;
+					$posShortens[$column] -= $shorten;
+					$shortened += $shorten;
+				}
+
+				// Fix rounding problem
+				foreach ($posShortens as $column=>$posShorten) {
+					if ($shortened >= $needShorten) {
+						break;
+					}
+					if ($posShorten <= 0) {
+						continue;
+					}
+
+					$shorten = 1;
+					$lengths[$column] -= $shorten;
+					$posShortens[$column] -= $shorten;
+					$shortened += $shorten;
+				}
+
+				// Nothing more to shorten
+				if ($shortened < $needShorten) {
+					echo "\033c";
+					echo 'Too small terminal, make it wider' . PHP_EOL;
+					sleep(Config::$config['gui']['reload_timeout']);
+					continue;
 				}
 			}
 
@@ -455,12 +561,11 @@ class Gui {
 					echo '|';
 				}
 				echo $this->config2color(Config::$config['color']['title']);
-				echo ' ' . mb_str_pad(
-						$this->columns[$column]['title'],
-						$lengths[$column],
-						' ',
-						$this->columns[$column]['padTitle']
-					) . ' ';
+				$this->printColumn(
+					$this->columns[$column]['title'],
+					$lengths[$column],
+					$this->columns[$column]['padTitle']
+				);
 				echo $this->config2color(Config::$config['color']['default']);
 			}
 			echo PHP_EOL;
@@ -500,18 +605,17 @@ class Gui {
 					} else {
 						echo '|';
 					}
-					echo ' ' . mb_str_pad(
-							$this->columnValue($k, $column),
-							$lengths[$column],
-							' ',
-							$this->columns[$column]['padValue']
-						) . ' ';
+					$this->printColumn(
+						$this->columnValue($k, $column),
+						$lengths[$column],
+						$this->columns[$column]['padValue']
+					);
 				}
 
 				echo $this->config2color(Config::$config['color']['default']);
 				echo PHP_EOL;
 
-				if (isset(Config::$config['gui']['max_todos']) && $pos >= Config::$config['gui']['max_todos']) {
+				if ($pos >= $maxTodos) {
 					echo "\033[K..." . PHP_EOL;
 					break;
 				}
@@ -561,6 +665,7 @@ class Gui {
 			}
 			echo PHP_EOL;
 			echo 'q  Quit' . PHP_EOL;
+
 			$cmd = $this->readLine->read('> ', '', Config::$config['gui']['reload_timeout']);
 			if ($this->readLine->timeout) {
 				continue;
