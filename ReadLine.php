@@ -36,6 +36,9 @@ class ReadLine {
 	public $timeout = false;
 	private $completitionCallback = null;
 	private $completition = '';
+	public $maxWidth = 80;
+	private $leftOffset = 0;
+	private $leftOffsetChange = 10;
 
 	public function setCompletitionCallback(callable $callback) {
 		$this->completitionCallback = $callback;
@@ -81,6 +84,7 @@ class ReadLine {
 			$this->line = $prefill;
 			$this->pos = strlen($this->line);
 			$this->completition = '';
+			$this->leftOffset = 0;
 		}
 
 		$this->state = self::READ;
@@ -119,18 +123,49 @@ class ReadLine {
 	}
 
 	private function repaint() {
+		$this->checkLeftOffset();
+
 		echo PHP_EOL;
 		echo "\033[K";
-		echo $this->completition;
+		if (mb_strlen($this->completition) > $this->maxWidth) {
+			echo mb_substr($this->completition, 0, $this->maxWidth - 1) . '→';
+		} else {
+			echo $this->completition;
+		}
 		echo "\033[1A";
 		echo "\033[9999D";
 		echo "\033[K";
 
 		echo $this->prefix;
-		echo $this->line;
-		$l = mb_strlen($this->line) - $this->pos;
-		if ($l) {
+
+		$maxLength = $this->maxWidth - mb_strlen($this->prefix);
+		$length = mb_strlen($this->line) - $this->leftOffset;
+		if ($this->leftOffset) {
+			echo '←';
+			$maxLength--;
+		}
+		echo mb_substr($this->line, $this->leftOffset, $maxLength - 1);
+		if ($length >= $maxLength) {
+			echo "→\033[1D";
+			$length = $maxLength - 1;
+		}
+
+		$l = $length - $this->pos + $this->leftOffset;
+		if ($l > 0) {
 			echo "\033[" . $l . "D";
+		}
+	}
+
+	private function checkLeftOffset() {
+		$maxLength = $this->maxWidth - mb_strlen($this->prefix) - 2;
+		if ($this->leftOffset) {
+			$maxLength--;
+		}
+		if ($this->pos <= $this->leftOffset) {
+			$this->leftOffset = floor($this->pos / $this->leftOffsetChange) * $this->leftOffsetChange;
+		}
+		if ($this->pos - $this->leftOffset >= $maxLength) {
+			$this->leftOffset = ceil(($this->pos - $maxLength) / $this->leftOffsetChange) * $this->leftOffsetChange;
 		}
 	}
 
@@ -181,7 +216,6 @@ class ReadLine {
 								} elseif (count($ar) > 1) {
 									$this->completition = implode(' ', $ar);
 								}
-
 							}
 						break;
 						case "\033":

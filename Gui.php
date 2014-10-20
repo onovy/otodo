@@ -499,6 +499,7 @@ class Gui {
 
 			// Screen width
 			$maxWidth = $this->getTerminalWidth();
+			$this->readLine->maxWidth = $maxWidth;
 			$width = -1;
 			foreach ($lengths as $length) {
 				$width += $length + 3;
