@@ -381,10 +381,10 @@ class Gui {
 			case 'text':
 			case 'priority':
 			case 'id':
-				$val = (string) $todo->$column;
+				$val = $todo->$column;
 			break;
 		}
-		return $val;
+		return (string) $val;
 	}
 
 	protected function getTerminalWidth() {
@@ -485,7 +485,11 @@ class Gui {
 				$minLengths[$column] = $lengths[$column];
 			}
 			$pos = 0;
+			$skip = $this->pageOffset;
 			foreach ($this->filteredTodos as $k=>$todo) {
+				while ($skip-- > 0) {
+					continue 2;
+				}
 				$pos++;
 				foreach ($columns as $column) {
 					$len = mb_strlen($this->columnValue($k, $column));
