@@ -28,6 +28,7 @@ class Gui {
 	private $search = null;
 	private $readLine = null;
 	private $lastTodoMtime = 0;
+	private $pageOffset = 0;
 	private $columns = array(
 		'num' => array(
 			'title' => '#',
@@ -463,7 +464,7 @@ class Gui {
 			}
 
 			// Screen height
-			$maxTodos = $this->getTerminalHeight() - 15;
+			$maxTodos = $this->getTerminalHeight() - 16;
 			if ($maxTodos <= 0) {
 				echo "\033c";
 				echo 'Too small terminal, make it taller' . PHP_EOL;
@@ -573,7 +574,23 @@ class Gui {
 
 			// Show todos
 			$pos = 0;
+			$skip = $this->pageOffset;
+			if ($skip) {
+				// Clear line
+				echo "\033[K..." . PHP_EOL;
+				$maxTodos--;
+			}
 			foreach ($this->filteredTodos as $k=>$todo) {
+				while ($skip-- > 0) {
+					continue 2;
+				}
+
+				// End?
+				if ($pos >= $maxTodos) {
+					echo "\033[K...";
+					break;
+				}
+
 				// Clear line
 				echo "\033[K";
 
@@ -616,10 +633,6 @@ class Gui {
 				echo $this->config2color(Config::$config['color']['default']);
 				echo PHP_EOL;
 
-				if ($pos >= $maxTodos) {
-					echo "\033[K..." . PHP_EOL;
-					break;
-				}
 			}
 
 			// Clear rest of screen
@@ -634,6 +647,7 @@ class Gui {
 			echo 'd  Set due date       D  Unset due date' . PHP_EOL;
 			echo 'g  Set recurrent      G  Unset recurrent' . PHP_EOL;
 			echo 'p  Priority           P  Unset priority' . PHP_EOL;
+			echo 'f  Next page          b  Previous page' . PHP_EOL;
 			echo 's  Sort: ';
 			$first = true;
 			foreach ($this->sort as $col => $asc) {
@@ -927,6 +941,23 @@ class Gui {
 					$this->todos[$num]->priority = null;
 					if ($this->changed()) {
 						$this->notice('Priority unset for todo ' . $num);
+					}
+				break;
+
+				// Next page
+				case 'f':
+				case 'F':
+					if ($this->pageOffset + $maxTodos < count($this->todos)) {
+						$this->pageOffset += $maxTodos;
+					}
+				break;
+
+				// Previous page
+				case 'b':
+				case 'B':
+					$this->pageOffset -= $maxTodos;
+					if ($this->pageOffset < 2) {
+						$this->pageOffset = 0;
 					}
 				break;
 
