@@ -970,6 +970,10 @@ class Gui {
 				case 'Q':
 					exit();
 				break;
+
+				default:
+					$this->error('Unknown command: '  . $cmd);
+				break;
 			}
 		}
 	}
