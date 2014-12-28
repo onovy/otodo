@@ -264,6 +264,10 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		$text1 = $this->searchPrepareInput($todo->text);
 
 		foreach ($this->todos as $todo2) {
+			if ($todo2->done) {
+				continue;
+			}
+
 			$text2 = $this->searchPrepareInput($todo2->text);
 
 			$perc = 0;
