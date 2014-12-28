@@ -234,6 +234,26 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		}
 	}
 
+	private function searchPrepareInput($input) {
+		$output = '';
+		$end = '';
+		$tokens = explode(' ', $input);
+
+		foreach ($tokens as $token) {
+			if ($token[0] == '+' || $token[0] == '@') {
+				$end .= $token . ' ';
+				continue;
+			}
+			$output .= $token . ' ';
+		}
+
+		$output .= $end;
+		$output = trim($output);
+		$output = strtolower($output);
+
+		return $output;
+	}
+
 	public function searchSimilar($todo) {
 		assert($todo instanceof Todo);
 
@@ -241,34 +261,10 @@ class Todos implements Iterator, ArrayAccess, Countable {
 		$max = 0;
 		$sTodo = null;
 
-		$text1 = '';
-		$end = '';
-		$tokens = explode(' ', $todo->text);
-		foreach ($tokens as $token) {
-			if ($token[0] == '+' || $token[0] == '@') {
-				$end .= $token . ' ';
-				continue;
-			}
-			$text1 .= $token . ' ';
-		}
-		$text1 .= $end;
-		$text1 = trim($text1);
-		$text1 = strtolower($text1);
+		$text1 = $this->searchPrepareInput($todo->text);
 
 		foreach ($this->todos as $todo2) {
-			$text2 = '';
-			$end = '';
-			$tokens = explode(' ', $todo2->text);
-			foreach ($tokens as $token) {
-				if ($token[0] == '+' || $token[0] == '@') {
-					$end .= $token . ' ';
-					continue;
-				}
-				$text2 .= $token . ' ';
-			}
-			$text2 .= $end;
-			$text2 = trim($text2);
-			$text2 = strtolower($text2);
+			$text2 = $this->searchPrepareInput($todo2->text);
 
 			$perc = 0;
 			similar_text($text1, $text2, $perc);
