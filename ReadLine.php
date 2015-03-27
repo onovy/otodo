@@ -302,6 +302,15 @@ class ReadLine {
 								$this->pos--;
 							}
 						break;
+						case '3': // Delete
+							if ($this->pos + 1 < mb_strlen($this->line)) {
+								$this->line =
+									mb_substr($this->line, 0, $this->pos) .
+									mb_substr($this->line, $this->pos + 1);
+							} else if ($this->pos + 1 == mb_strlen($this->line)) {
+								$this->line = mb_substr($this->line, 0, -1);
+							}
+						break;
 					}
 					if (ord($ch) >= 64 && ord($ch) <= 126) {
 						$this->state = self::READ;
