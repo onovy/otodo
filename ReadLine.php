@@ -24,6 +24,7 @@ class ReadLine {
 	const END = 2;
 	const ESC_033 = 3;  // \033
 	const ESC_033B = 5; // \033[
+	const ESC_033O = 6; // \033O
 
 	private $input = '';
 	private $line = '';
@@ -248,6 +249,9 @@ class ReadLine {
 						case '[':
 							$this->state = self::ESC_033B;
 						break;
+						case 'O':
+							$this->state = self::ESC_033O;
+						break;
 					}
 				break;
 				case self::ESC_033B:
@@ -297,6 +301,17 @@ class ReadLine {
 							}
 						break;
 					}
+				break;
+				case self::ESC_033O:
+					switch ($ch) {
+						case 'H': // Home
+							$this->pos = 0;
+						break;
+						case 'F': // End
+							$this->pos = mb_strlen($this->line);
+						break;
+					}
+					$this->state = self::READ;
 				break;
 			}
 		}
