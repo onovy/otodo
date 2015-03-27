@@ -25,6 +25,7 @@ class ReadLine {
 	const ESC_033 = 3;  // \033
 	const ESC_033B = 5; // \033[
 	const ESC_033O = 6; // \033O
+	const ESC_033_TWOCHAR = 7; // \033??
 
 	private $input = '';
 	private $line = '';
@@ -252,12 +253,16 @@ class ReadLine {
 						case 'O':
 							$this->state = self::ESC_033O;
 						break;
+						default:
+							if (ord($ch) >= 64 && ord($ch) <= 95) {
+								$this->state = self::ESC_033_TWOCHAR;
+							}
+						break;
 					}
 				break;
 				case self::ESC_033B:
 					switch ($ch) {
 						case 'A': // Up
-							$this->state = self::READ;
 							if ($this->historyPos === null) {
 								if ($this->line === '' && $this->historyNew !== null) {
 									$this->line = $this->historyNew;
@@ -276,7 +281,6 @@ class ReadLine {
 							$this->pos = mb_strlen($this->line);
 						break;
 						case 'B': // Down
-							$this->state = self::READ;
 							if ($this->historyPos === null) {
 								$this->line = '';
 							} elseif ($this->historyPos < count($this->history) - 1) {
@@ -289,17 +293,18 @@ class ReadLine {
 							$this->pos = mb_strlen($this->line);
 						break;
 						case 'C': // Right
-							$this->state = self::READ;
 							if (mb_strlen($this->line) > $this->pos) {
 								$this->pos++;
 							}
 						break;
 						case 'D': // Left
-							$this->state = self::READ;
 							if ($this->pos > 0) {
 								$this->pos--;
 							}
 						break;
+					}
+					if (ord($ch) >= 64 && ord($ch) <= 126) {
+						$this->state = self::READ;
 					}
 				break;
 				case self::ESC_033O:
@@ -311,6 +316,9 @@ class ReadLine {
 							$this->pos = mb_strlen($this->line);
 						break;
 					}
+					$this->state = self::READ;
+				break;
+				case self::ESC_033_TWOCHAR:
 					$this->state = self::READ;
 				break;
 			}
