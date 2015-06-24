@@ -196,7 +196,7 @@ class ReadLine {
 						case "\t": // Tab
 							if (!is_null($this->completitionCallback)) {
 								$search = mb_substr($this->line, 0, $this->pos);
-								$pos = strrpos($search, ' ');
+								$pos = mb_strrpos($search, ' ');
 								if ($pos !== false) {
 									$search = mb_substr($search, $pos + 1);
 								}

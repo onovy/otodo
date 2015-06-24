@@ -327,8 +327,8 @@ class Gui {
 
 		$prep = '';
 		while (strlen($search) && !in_array($search[0], array('+', '@'))) {
-			$prep .= $search[0];
-			$search = substr($search, 1);
+			$prep .= mb_substr($search, 0, 1);
+			$search = mb_substr($search, 1);
 		}
 		if (empty($search)) {
 			return array();
@@ -336,12 +336,12 @@ class Gui {
 
 		foreach ($this->todos as $todo) {
 			foreach ($todo->projects as $project) {
-				if ('+' . substr($project, 0, strlen($search) - 1) == $search) {
+				if ('+' . mb_substr($project, 0, mb_strlen($search) - 1) == $search) {
 					$out[] = $prep . '+' . $project;
 				}
 			}
 			foreach ($todo->contexts as $context) {
-				if ('@' . substr($context, 0, strlen($search) - 1) == $search) {
+				if ('@' . mb_substr($context, 0, mb_strlen($search) - 1) == $search) {
 					$out[] = $prep . '@' . $context;
 				}
 			}
