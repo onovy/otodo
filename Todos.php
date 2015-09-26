@@ -172,7 +172,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 			break;
 			case 'id':
 				if ($a->$col === $b->$col) {
-					return 0;
+					return 0; // @codeCoverageIgnore
 				}
 				if ($a->$col > $b->$col) {
 					return $asc ? 1 : -1;

@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once '../init.php';
+require_once 'init.php';
 
 class TodosExTest extends PHPUnit_Framework_TestCase {
 	public function testInOut() {
@@ -34,15 +34,13 @@ class TodosExTest extends PHPUnit_Framework_TestCase {
 		$ts = new TodosEx();
 		$ts->loadFromFile('todo.txt');
 		$ts->sort(array(
-			'done' => true,
-			'priority' => false,
-			'text' => false,
+			'due' => true,
 		));
 		$ids = array();
 		foreach ($ts as $t) {
 			$ids[] = $t->id;
 		}
-		$this->assertEquals($ids, array(4, 1, 3, 7, 9, 0, 6, 2, 8, 5));
+		$this->assertEquals($ids, array(9, 3, 8, 10, 0, 1, 2, 4, 5, 6, 7));
 	}
 
 	public function testSortPersistent() {

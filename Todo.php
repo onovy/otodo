@@ -107,7 +107,7 @@ class Todo {
 					' on line ' . $trace[0]['line'],
 					E_USER_ERROR
 				);
-			break;
+			break; // @codeCoverageIgnore
 		}
 	}
 
@@ -124,9 +124,9 @@ class Todo {
 					' on line ' . $trace[0]['line'],
 					E_USER_ERROR
 				);
-			break;
+			break; // @codeCoverageIgnore
 		}
-	}
+	} // @codeCoverageIgnore
 
 	public function fillFromString($line) {
 		$line = rtrim($line);
@@ -194,6 +194,9 @@ class Todo {
 		$this->doneDate = null;
 	}
 
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function debug() {
 		echo '=========' . PHP_EOL;
 		echo 'Done: ' . ($this->done ? 't' : 'f') . PHP_EOL;

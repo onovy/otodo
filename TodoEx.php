@@ -89,6 +89,9 @@ class TodoEx extends Todo {
 		}
 	}
 
+	/**
+	 * @codeCoverageIgnore
+	 */
 	public function debug() {
 		parent::debug();
 		if ($this->due !== null) {

@@ -18,21 +18,21 @@ You should have received a copy of the GNU General Public License
 along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once '../init.php';
+require_once 'init.php';
 
 class TodoTest extends PHPUnit_Framework_TestCase {
 	public function testInOut() {
 		$tests = array(
 			'(A) dummy',
-			'2014-01-01 dummy',
+			'2014-02-01 dummy',
 			'(B) 2014-02-01 dummy',
 			'x dummy',
 			'x (C) dummy',
 			'x (D) 2014-03-01 dummy',
-			'x 2014-01-01 dummy',
-			'x 2014-01-01 (C) dummy',
-			'x 2014-01-01 2014-03-01 dummy',
-			'x 2014-01-01 (D) 2014-03-01 dummy',
+			'x 2014-02-01 dummy',
+			'x 2014-02-01 (C) dummy',
+			'x 2014-02-01 2014-03-01 dummy',
+			'x 2014-02-01 (D) 2014-03-01 dummy',
 			'',
 		);
 
@@ -47,8 +47,8 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($t->priority, 'A');
 		$this->assertEquals($t->text, 'dummy');
 
-		$t = new Todo(null, '2014-01-01 dummy');
-		$this->assertEquals($t->creationDate->format('Y-m-d'), '2014-01-01');
+		$t = new Todo(null, '2014-02-01 dummy');
+		$this->assertEquals($t->creationDate->format('Y-m-d'), '2014-02-01');
 		$this->assertEquals($t->text, 'dummy');
 
 		$t = new Todo(null, '(B) 2014-02-01 dummy');
@@ -71,26 +71,26 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals($t->creationDate->format('Y-m-d'), '2014-03-01');
 		$this->assertEquals($t->text, 'dummy');
 
-		$t = new Todo(null, 'x 2014-01-01 dummy');
+		$t = new Todo(null, 'x 2014-02-01 dummy');
 		$this->assertTrue($t->done);
-		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-01-01');
+		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-02-01');
 		$this->assertEquals($t->text, 'dummy');
 
-		$t = new Todo(null, 'x 2014-01-01 (C) dummy');
+		$t = new Todo(null, 'x 2014-02-01 (C) dummy');
 		$this->assertTrue($t->done);
-		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-01-01');
+		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-02-01');
 		$this->assertEquals($t->priority, 'C');
 		$this->assertEquals($t->text, 'dummy');
 
-		$t = new Todo(null, 'x 2014-01-01 2014-03-01 dummy');
+		$t = new Todo(null, 'x 2014-02-01 2014-03-01 dummy');
 		$this->assertTrue($t->done);
-		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-01-01');
+		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-02-01');
 		$this->assertEquals($t->creationDate->format('Y-m-d'), '2014-03-01');
 		$this->assertEquals($t->text, 'dummy');
 
-		$t = new Todo(null, 'x 2014-01-01 (D) 2014-03-01 dummy');
+		$t = new Todo(null, 'x 2014-02-01 (D) 2014-03-01 dummy');
 		$this->assertTrue($t->done);
-		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-01-01');
+		$this->assertEquals($t->doneDate->format('Y-m-d'), '2014-02-01');
 		$this->assertEquals($t->priority, 'D');
 		$this->assertEquals($t->creationDate->format('Y-m-d'), '2014-03-01');
 		$this->assertEquals($t->text, 'dummy');
@@ -109,8 +109,8 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGenerator() {
-		$date1 = new DateTime('2014-01-01');
-		$date2 = new DateTime('2014-02-01');
+		$date1 = new DateTime('2014-02-01');
+		$date2 = new DateTime('2014-03-01');
 
 		$t = new Todo(null);
 		$t->priority = 'A';
@@ -120,13 +120,13 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 		$t = new Todo(null);
 		$t->creationDate = $date1;
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), '2014-01-01 dummy');
+		$this->assertEquals($t->generateString(), '2014-02-01 dummy');
 
 		$t = new Todo(null);
 		$t->priority = 'B';
 		$t->creationDate = $date1;
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), '(B) 2014-01-01 dummy');
+		$this->assertEquals($t->generateString(), '(B) 2014-02-01 dummy');
 
 		$t = new Todo(null);
 		$t->done = true;
@@ -144,27 +144,27 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 		$t->priority = 'D';
 		$t->creationDate = $date1;
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), 'x (D) 2014-01-01 dummy');
+		$this->assertEquals($t->generateString(), 'x (D) 2014-02-01 dummy');
 
 		$t = new Todo(null);
 		$t->done = true;
 		$t->doneDate = $date1;
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), 'x 2014-01-01 dummy');
+		$this->assertEquals($t->generateString(), 'x 2014-02-01 dummy');
 
 		$t = new Todo(null);
 		$t->done = true;
 		$t->doneDate = $date1;
 		$t->priority = 'C';
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), 'x 2014-01-01 (C) dummy');
+		$this->assertEquals($t->generateString(), 'x 2014-02-01 (C) dummy');
 
 		$t = new Todo(null);
 		$t->done = true;
 		$t->doneDate = $date1;
 		$t->creationDate = $date2;
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), 'x 2014-01-01 2014-02-01 dummy');
+		$this->assertEquals($t->generateString(), 'x 2014-02-01 2014-03-01 dummy');
 
 		$t = new Todo(null);
 		$t->done = true;
@@ -172,7 +172,7 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 		$t->priority = 'D';
 		$t->creationDate = $date2;
 		$t->text = 'dummy';
-		$this->assertEquals($t->generateString(), 'x 2014-01-01 (D) 2014-02-01 dummy');
+		$this->assertEquals($t->generateString(), 'x 2014-02-01 (D) 2014-03-01 dummy');
 	}
 
 	public function testMarkDone() {
@@ -180,14 +180,38 @@ class TodoTest extends PHPUnit_Framework_TestCase {
 		$t->markDone();
 		$this->assertTrue($t->done);
 		$this->assertEquals($t->doneDate->format('Y-m-d'), (new DateTime())->format('Y-m-d'));
-	}
 
-	public function testUnmarkDone() {
-		$t = new Todo(null);
-		$t->done = true;
-		$t->doneDate = new DateTime();
 		$t->unmarkDone();
 		$this->assertFalse($t->done);
 		$this->assertNull($t->doneDate);
+	}
+
+	public function testChange() {
+		$t = new Todo(null, 'x 2014-02-01 (D) 2014-03-01 dummy');
+
+		$t->text = 'dummy2';
+		$this->assertEquals($t->text, 'dummy2');
+
+		$t->priority = 'B';
+		$this->assertEquals($t->priority, 'B');
+
+		$t->priority = null;
+		$this->assertEquals($t->priority, null);
+	}
+
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testWrongSet() {
+		$t = new Todo(null);
+		$t->notExists = '';
+	}
+
+	/**
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testWrongGet() {
+		$t = new Todo(null);
+		$t->notExists;
 	}
 }

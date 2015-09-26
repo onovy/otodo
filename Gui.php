@@ -223,6 +223,8 @@ class Gui {
 			}
 			$this->sort[$sort] = $asc;
 		}
+
+		return $this->sort;
 	}
 
 	protected function parseDate($date) {
@@ -255,9 +257,11 @@ class Gui {
 					case 'y':
 						$m = 'year';
 					break;
+					// @codeCoverageIgnoreStart
 					default:
 						throw new DateParseException($date);
 					break;
+					// @codeCoverageIgnoreEnd
 				}
 				$dt = new DateTime('today');
 				$dt->modify('+' . $matches[1] . ' ' . $m);

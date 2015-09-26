@@ -18,7 +18,7 @@ You should have received a copy of the GNU General Public License
 along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-require_once '../init.php';
+require_once 'init.php';
 
 class RecurrentTest extends PHPUnit_Framework_TestCase {
 	public function testInOut() {
@@ -118,5 +118,21 @@ class RecurrentTest extends PHPUnit_Framework_TestCase {
 				$r->recurr($ts)->format('Y-m-d'),
 				$out);
 		}
+	}
+
+	/**
+	 * @expectedException RecurrentParseException
+	 */
+	public function testRecurrWrongC() {
+		new Recurrent('1wrong');
+	}
+
+	/**
+	 * @expectedException RecurrentParseException
+	 */
+	public function testRecurrWrongR() {
+		$r = new Recurrent('1d');
+		$r->unit = 'wrong';
+		$r->recurr(null);
 	}
 }
