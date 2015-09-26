@@ -193,6 +193,7 @@ class Gui {
 					return;
 				}
 			}
+			mkdir($dir, 0700, true);
 			copy(
 				$source,
 				$targetA
