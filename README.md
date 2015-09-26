@@ -1,5 +1,7 @@
 # otodo #
 
+![Travis CI](https://travis-ci.org/onovy/otodo.svg?branch=master)
+
 Powerfull TUI for todo.txt.
 
 ![Screenshot](https://raw.githubusercontent.com/onovy/otodo/master/screenshot.png "Screenshot")
