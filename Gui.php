@@ -284,7 +284,7 @@ class Gui {
 	protected function getLineNumber($cmd) {
 		$num = substr($cmd, 1);
 		if (!is_numeric($num)) {
-			if ($this->lastLineNumber && $num == 'l') {
+			if ($this->lastLineNumber !== null && $num == 'l') {
 				$num = $this->lastLineNumber;
 			} else if (count($this->filteredTodos) == 1) {
 				$num = array_pop(array_keys($this->filteredTodos));
