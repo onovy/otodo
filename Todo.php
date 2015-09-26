@@ -177,6 +177,7 @@ class Todo {
 			$out .= $this->creationDate->format('Y-m-d') . ' ';
 		}
 		$out .= $this->text . ' ';
+		ksort($this->addons);
 		foreach ($this->addons as $k=>$v) {
 			$out .= $k . ':' . $v . ' ';
 		}
