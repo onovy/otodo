@@ -881,6 +881,7 @@ class Gui {
 
 				// Search
 				case '/':
+					$this->pageOffset = 0;
 					$search = trim(substr($cmd, 1));
 					if (empty($search)) {
 						$search = $this->readLine->read('Search: ');
