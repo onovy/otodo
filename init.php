@@ -31,7 +31,9 @@ require_once dirname(__FILE__) . '/Exception.php';
 require_once dirname(__FILE__) . '/Todos.php';
 require_once dirname(__FILE__) . '/Todo.php';
 require_once dirname(__FILE__) . '/Recurrent.php';
+require_once dirname(__FILE__) . '/Term.php';
 require_once dirname(__FILE__) . '/Gui.php';
+require_once dirname(__FILE__) . '/GuiDiff.php';
 require_once dirname(__FILE__) . '/ReadLine.php';
 require_once dirname(__FILE__) . '/Config.php';
 

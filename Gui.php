@@ -29,6 +29,9 @@ class Gui {
 	private $readLine = null;
 	private $lastTodoMtime = 0;
 	private $pageOffset = 0;
+	private static $terminalWidth = 0;
+	private static $terminalHeight = 0;
+	private static $terminalCache = 0;
 	private $columns = array(
 		'num' => array(
 			'title' => '#',
@@ -387,24 +390,6 @@ class Gui {
 		return (string) $val;
 	}
 
-	protected function getTerminalWidth() {
-		$n = exec('tput cols');
-		if (is_numeric($n)) {
-			return (int) $n;
-		}
-		echo 'Can\'t detect terminal width!' . PHP_EOL;
-		exit(-1);
-	}
-
-	protected function getTerminalHeight() {
-		$n = exec('tput lines');
-		if (is_numeric($n)) {
-			return (int) $n;
-		}
-		echo 'Can\'t detect terminal height!' . PHP_EOL;
-		exit(-1);
-	}
-
 	protected function printColumn($value, $length, $pad) {
 		if (mb_strlen($value) > $length) {
 			echo ' ' . mb_substr(
@@ -464,7 +449,7 @@ class Gui {
 			}
 
 			// Screen height
-			$maxTodos = $this->getTerminalHeight() - 16;
+			$maxTodos = Term::getTerminalHeight() - 16;
 			if ($maxTodos <= 0) {
 				echo "\033c";
 				echo 'Too small terminal, make it taller' . PHP_EOL;
@@ -503,7 +488,7 @@ class Gui {
 			}
 
 			// Screen width
-			$maxWidth = $this->getTerminalWidth();
+			$maxWidth = Term::getTerminalWidth();
 			$this->readLine->maxWidth = $maxWidth;
 			$width = -1;
 			foreach ($lengths as $length) {
@@ -652,6 +637,7 @@ class Gui {
 			echo 'g  Set recurrent      G  Unset recurrent' . PHP_EOL;
 			echo 'p  Priority           P  Unset priority' . PHP_EOL;
 			echo 'f  Next page          b  Previous page' . PHP_EOL;
+			echo 'h  History browser' . PHP_EOL;
 			echo 's  Sort: ';
 			$first = true;
 			foreach ($this->sort as $col => $asc) {
@@ -963,6 +949,13 @@ class Gui {
 					if ($this->pageOffset < 2) {
 						$this->pageOffset = 0;
 					}
+				break;
+
+				// History browser
+				case 'h':
+				case 'H':
+					$diff = new GuiDiff();
+					$diff->start();
 				break;
 
 				// Quit
