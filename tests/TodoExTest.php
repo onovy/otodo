@@ -72,7 +72,8 @@ class TodoExTest extends PHPUnit_Framework_TestCase {
 		$t->due = new DateTime('2014-01-01');
 		$t->markDone();
 		$this->assertTrue($ts->count() == 1);
-		$t = $ts[array_pop($ts->array_keys())];
+		$keys = $ts->array_keys();
+		$t = $ts[array_pop($keys)];
 		$this->assertFalse($t->done);
 		$this->assertEquals($t->text, 'dummy');
 		$this->assertEquals($t->recurrent->toString(), '1d');
