@@ -29,9 +29,9 @@ class Gui {
 	private $readLine = null;
 	private $lastTodoMtime = 0;
 	private $pageOffset = 0;
-	private static $terminalWidth = 0;
-	private static $terminalHeight = 0;
-	private static $terminalCache = 0;
+	private $idLineIndex = array();
+	private $lastHighlight = 0;
+	private $disablePaintHighlight = false;
 	private $columns = array(
 		'num' => array(
 			'title' => '#',
@@ -294,6 +294,9 @@ class Gui {
 				$num = $this->readLine->read('Num: ');
 			}
 		}
+		if ($this->lastLineNumber !== null && $num == 'l') {
+			$num = $this->lastLineNumber;
+		}
 		if (!is_numeric($num)) {
 			$this->error('Need todo number');
 			return null;
@@ -304,6 +307,8 @@ class Gui {
 			return null;
 		}
 		$this->lastLineNumber = $num;
+		$this->paintHighlight($num);
+		$this->disablePaintHighlight = true;
 		return $num;
 	}
 
@@ -357,6 +362,65 @@ class Gui {
 			}
 		}
 		return array_unique($out);
+	}
+
+	protected function paintHighlight($line) {
+		if ($this->disablePaintHighlight) {
+			return;
+		}
+
+		// Clear last highlight
+		if ($this->lastHighlight !== null) {
+			$i = $this->lastHighlight;
+			echo "\033[s";
+			if ($i % 2 == 0) {
+				echo $this->config2color(Config::$config['color']['todo_odd']);
+			} else {
+				echo $this->config2color(Config::$config['color']['todo_even']);
+			}
+			if ($this->pageOffset) {
+				$i++;
+			}
+			echo "\033[" . $i . ";0H";
+			echo ' ';
+			echo "\033[u";
+			echo $this->config2color(Config::$config['color']['default']);
+			$this->lastHighlight = null;
+		}
+
+		// New highlight
+		if (strlen($line) > 0 && preg_match('/(\d+|l)?$/', $line, $m)) {
+			$num = null;
+			if (!isset($m[1]) && count($this->filteredTodos) == 1) {
+				$num = array_pop(array_keys($this->filteredTodos));
+			} elseif (isset($m[1]) && $m[1] == 'l' && $this->lastLineNumber !== null) {
+				$num = $this->lastLineNumber;
+			} elseif (isset($m[1]) && is_numeric($m[1])) {
+				$num = (int) $m[1];
+			}
+
+			if ($num === null) {
+				return;
+			}
+
+			if (isset($this->idLineIndex[$num])) {
+				$highlight = $this->idLineIndex[$num] + 2;
+				$this->lastHighlight = $highlight;
+				echo "\033[s";
+				if ($highlight % 2 == 0) {
+					echo $this->config2color(Config::$config['color']['todo_odd']);
+				} else {
+					echo $this->config2color(Config::$config['color']['todo_even']);
+				}
+				if ($this->pageOffset) {
+					$highlight++;
+				}
+				echo "\033[" . $highlight . ";0H";
+				echo '▶';
+				echo "\033[u";
+				echo $this->config2color(Config::$config['color']['default']);
+			}
+		}
 	}
 
 	protected function columnValue($k, $column) {
@@ -419,6 +483,9 @@ class Gui {
 		$this->readLine->setCompletitionCallback(function($input) {
 			return $this->readlineCompletion($input);
 		});
+		$this->readLine->setPaintCallback(function($line) {
+			return $this->paintHighlight($line);
+		});
 		try {
 			$this->readLine->historyLoad(Config::$config['gui']['history_file']);
 		} catch (HistoryLoadException $hle) {
@@ -430,6 +497,8 @@ class Gui {
 		echo "\033c";
 		while (true) {
 			$this->loadIfChanged();
+			$this->disablePaintHighlight = false;
+			$this->paintHighlight('');
 
 			$search = $this->search;
 			if ($search === null) {
@@ -576,6 +645,7 @@ class Gui {
 				echo "\033[K..." . PHP_EOL;
 				$maxTodos--;
 			}
+			$this->idLineIndex = array();
 			foreach ($this->filteredTodos as $k=>$todo) {
 				while ($skip-- > 0) {
 					continue 2;
@@ -586,6 +656,8 @@ class Gui {
 					echo "\033[K...";
 					break;
 				}
+
+				$this->idLineIndex[$k] = $pos;
 
 				// Clear line
 				echo "\033[K";

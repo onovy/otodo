@@ -37,6 +37,7 @@ class ReadLine {
 	private $prefix = '';
 	public $timeout = false;
 	private $completitionCallback = null;
+	private $paintCallback = null;
 	private $completition = '';
 	public $maxWidth = 80;
 	private $leftOffset = 0;
@@ -44,6 +45,10 @@ class ReadLine {
 
 	public function setCompletitionCallback(callable $callback) {
 		$this->completitionCallback = $callback;
+	}
+
+	public function setPaintCallback(callable $callback) {
+		$this->paintCallback = $callback;
 	}
 
 	public function historyAdd($line) {
@@ -155,6 +160,10 @@ class ReadLine {
 		$l = $length - $this->pos + $this->leftOffset;
 		if ($l > 0) {
 			echo "\033[" . $l . "D";
+		}
+
+		if (!is_null($this->paintCallback)) {
+			call_user_func($this->paintCallback, $this->line);
 		}
 	}
 
