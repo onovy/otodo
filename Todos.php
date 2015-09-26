@@ -194,7 +194,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $cmp;
 				}
 			}
-			return static::sortCmp('id', false, $a, $b);
+			return static::sortCmp('id', true, $a, $b);
 		});
 	}
 
@@ -206,7 +206,7 @@ class Todos implements Iterator, ArrayAccess, Countable {
 					return $cmp;
 				}
 			}
-			return static::sortCmp('id', false, $a, $b);
+			return static::sortCmp('id', true, $a, $b);
 		});
 	}
 
