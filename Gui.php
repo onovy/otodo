@@ -193,7 +193,7 @@ class Gui {
 					return;
 				}
 			}
-			mkdir($dir, 0700, true);
+			@mkdir($dir, 0700, true);
 			copy(
 				$source,
 				$targetA
@@ -454,7 +454,7 @@ class Gui {
 			}
 
 			// Screen height
-			$maxTodos = Term::getTerminalHeight() - 16;
+			$maxTodos = Term::getTerminalHeight() - 17;
 			if ($maxTodos <= 0) {
 				echo "\033c";
 				echo 'Too small terminal, make it taller' . PHP_EOL;
