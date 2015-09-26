@@ -750,6 +750,9 @@ class Gui {
 						if ($this->changed()) {
 							$this->notice('Todo ' . $num . ' removed');
 						}
+						if ($num === $this->lastLineNumber) {
+							$this->lastLineNumber = null;
+						}
 					} else {
 						$this->error('Todo ' . $num . ' NOT removed');
 					}
