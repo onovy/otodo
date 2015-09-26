@@ -311,6 +311,12 @@ class ReadLine {
 								$this->line = mb_substr($this->line, 0, -1);
 							}
 						break;
+						case 'H': // Home
+							$this->pos = 0;
+						break;
+						case 'F': // End
+							$this->pos = mb_strlen($this->line);
+						break;
 					}
 					if (ord($ch) >= 64 && ord($ch) <= 126) {
 						$this->state = self::READ;
