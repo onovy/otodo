@@ -381,8 +381,13 @@ class Gui {
 			if ($this->pageOffset) {
 				$i++;
 			}
-			echo "\033[" . $i . ";0H";
-			echo ' ';
+			$columns = Config::$config['gui']['columns'];
+			$x = 1;
+			foreach ($columns as $k=>$l) {
+				echo "\033[" . $i . ";" . $x . "H";
+				echo ' ';
+				$x += $this->columnsLength[$l] + 3;
+			}
 			echo "\033[u";
 			echo $this->config2color(Config::$config['color']['default']);
 			$this->lastHighlight = null;
@@ -415,8 +420,13 @@ class Gui {
 				if ($this->pageOffset) {
 					$highlight++;
 				}
-				echo "\033[" . $highlight . ";0H";
-				echo '▶';
+				$columns = Config::$config['gui']['columns'];
+				$x = 1;
+				foreach ($columns as $k=>$l) {
+					echo "\033[" . $highlight . ";" . $x . "H";
+					echo '▶';
+					$x += $this->columnsLength[$l] + 3;
+				}
 				echo "\033[u";
 				echo $this->config2color(Config::$config['color']['default']);
 			}
@@ -535,15 +545,15 @@ class Gui {
 
 			// Detect max length of every column
 			$columns = Config::$config['gui']['columns'];
-			$lengths = array();
+			$this->columnsLength = array();
 			$minLengths = array();
 			foreach ($columns as $column) {
 				if (!isset($this->columns[$column])) {
 					echo 'Unknow column: ' . $column . ', check configuration gui.columns!' . PHP_EOL;
 					exit(-1);
 				}
-				$lengths[$column] = mb_strlen($this->columns[$column]['title']);
-				$minLengths[$column] = $lengths[$column];
+				$this->columnsLength[$column] = mb_strlen($this->columns[$column]['title']);
+				$minLengths[$column] = $this->columnsLength[$column];
 			}
 			$pos = 0;
 			$skip = $this->pageOffset;
@@ -554,8 +564,8 @@ class Gui {
 				$pos++;
 				foreach ($columns as $column) {
 					$len = mb_strlen($this->columnValue($k, $column));
-					if ($len > $lengths[$column]) {
-						$lengths[$column] = $len;
+					if ($len > $this->columnsLength[$column]) {
+						$this->columnsLength[$column] = $len;
 					}
 				}
 				if ($pos >= $maxTodos) {
@@ -567,7 +577,7 @@ class Gui {
 			$maxWidth = Term::getTerminalWidth();
 			$this->readLine->maxWidth = $maxWidth;
 			$width = -1;
-			foreach ($lengths as $length) {
+			foreach ($this->columnsLength as $length) {
 				$width += $length + 3;
 			}
 			$needShorten = $width - $maxWidth;
@@ -576,15 +586,15 @@ class Gui {
 				$posShortens = array();
 				$posShortenSum = 0;
 				foreach ($columns as $column) {
-					if ($this->columns[$column]['shorten'] && $lengths[$column] > $minLengths[$column]) {
-						$posShortens[$column] = $lengths[$column] - $minLengths[$column];
+					if ($this->columns[$column]['shorten'] && $this->columnsLength[$column] > $minLengths[$column]) {
+						$posShortens[$column] = $this->columnsLength[$column] - $minLengths[$column];
 						$posShortenSum += $posShortens[$column];
 					}
 				}
 				$shortened = 0;
 				foreach ($posShortens as $column=>$posShorten) {
 					$shorten = floor((float) $posShorten / (float) $posShortenSum * (float) $needShorten);
-					$lengths[$column] -= $shorten;
+					$this->columnsLength[$column] -= $shorten;
 					$posShortens[$column] -= $shorten;
 					$shortened += $shorten;
 				}
@@ -599,7 +609,7 @@ class Gui {
 					}
 
 					$shorten = 1;
-					$lengths[$column] -= $shorten;
+					$this->columnsLength[$column] -= $shorten;
 					$posShortens[$column] -= $shorten;
 					$shortened += $shorten;
 				}
@@ -630,7 +640,7 @@ class Gui {
 				echo $this->config2color(Config::$config['color']['title']);
 				$this->printColumn(
 					$this->columns[$column]['title'],
-					$lengths[$column],
+					$this->columnsLength[$column],
 					$this->columns[$column]['padTitle']
 				);
 				echo $this->config2color(Config::$config['color']['default']);
@@ -693,7 +703,7 @@ class Gui {
 					}
 					$this->printColumn(
 						$this->columnValue($k, $column),
-						$lengths[$column],
+						$this->columnsLength[$column],
 						$this->columns[$column]['padValue']
 					);
 				}
