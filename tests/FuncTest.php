@@ -23,7 +23,37 @@ require_once 'init.php';
 class FuncTest extends PHPUnit_Framework_TestCase {
 	public function testMbStrPad() {
 		$this->assertEquals(mb_str_pad('heřlo', 7, 'A', STR_PAD_RIGHT), 'heřloAA');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'A'), 'heřloAA');
 		$this->assertEquals(mb_str_pad('heřlo', 7, 'A', STR_PAD_LEFT), 'AAheřlo');
 		$this->assertEquals(mb_str_pad('heřlo', 7, 'A', STR_PAD_BOTH), 'AheřloA');
+
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'AB', STR_PAD_RIGHT), 'heřloAB');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'AB', STR_PAD_LEFT), 'ABheřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'AB', STR_PAD_BOTH), 'AheřloA');
+
+		$this->assertEquals(mb_str_pad('heřlo', 8, 'AB', STR_PAD_RIGHT), 'heřloABA');
+		$this->assertEquals(mb_str_pad('heřlo', 8, 'AB', STR_PAD_LEFT), 'ABAheřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 8, 'AB', STR_PAD_BOTH), 'AheřloAB');
+
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'č', STR_PAD_LEFT), 'ččheřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'č', STR_PAD_RIGHT), 'heřločč');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'č', STR_PAD_BOTH), 'čheřloč');
+
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'čď', STR_PAD_LEFT), 'čďheřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'čď', STR_PAD_RIGHT), 'heřločď');
+		$this->assertEquals(mb_str_pad('heřlo', 7, 'čď', STR_PAD_BOTH), 'čheřloč');
+
+		$this->assertEquals(mb_str_pad('heřlo', 8, 'čď', STR_PAD_LEFT), 'čďčheřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 8, 'čď', STR_PAD_RIGHT), 'heřločďč');
+		$this->assertEquals(mb_str_pad('heřlo', 8, 'čď', STR_PAD_BOTH), 'čheřločď');
+
+		$this->assertEquals(mb_str_pad('heřlo', 6, 'čď', STR_PAD_LEFT), 'čheřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 6, 'čď', STR_PAD_RIGHT), 'heřloč');
+		$this->assertEquals(mb_str_pad('heřlo', 6, 'čď', STR_PAD_BOTH), 'heřloč');
+
+		$this->assertEquals(mb_str_pad('heřlo', 5, 'č', STR_PAD_LEFT), 'heřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 4, 'č', STR_PAD_LEFT), 'heřlo');
+		$this->assertEquals(mb_str_pad('heřlo', 0, 'č', STR_PAD_LEFT), 'heřlo');
+		$this->assertEquals(mb_str_pad('heřlo', -1, 'č', STR_PAD_LEFT), 'heřlo');
 	}
 }
