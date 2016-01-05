@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/onovy/otodo.svg?branch=master)](https://travis-ci.org/onovy/otodo)
 
-Powerfull TUI for todo.txt.
+Powerful TUI for todo.txt.
 
 ![Screenshot](https://raw.githubusercontent.com/onovy/otodo/master/screenshot.png "Screenshot")
 
 ## Requirements ##
-otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 5.4, but it should work on older version. No extension is requred. It should work on almost any Unix-like system, tested on Mac OS X.
+otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 5.4, but it should work on older version. No extension is required. It should work on almost any Unix-like system, tested on Mac OS X.
 
 ## Installation ##
 There isn't any releases, I consider master branch at Github as stable.
