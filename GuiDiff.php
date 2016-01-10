@@ -132,9 +132,16 @@ class GuiDiff {
 			DIRECTORY_SEPARATOR . $this->two;
 
 		$this->data = array();
-		exec(Config::$config['gui']['diff'] . ' ' .
+		$ret = 0;
+		$cmd = Config::$config['gui']['diff'] . ' ' .
 			escapeshellarg($oneD) . ' ' .
-			escapeshellarg($twoD), $this->data);
+			escapeshellarg($twoD);
+		exec($cmd, $this->data, $ret);
+		if (!in_array($ret, Config::$config['gui']['diffRet'])) {
+			array_unshift($this->data, 'Return code: ' . $ret);
+			array_unshift($this->data, $cmd);
+			array_unshift($this->data, 'Failed to execute diff cmd:');
+		}
 
 		$this->show();
 	}
