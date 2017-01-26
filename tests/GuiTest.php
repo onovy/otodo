@@ -69,6 +69,16 @@ class GuiTest extends PHPUnit_Framework_TestCase {
 
 		$gui = new Gui();
 
+		$ret = invokeMethod($gui, 'parseSortString', array('a'));
+		$this->assertEquals($ret, array(
+			'a' => true,
+		));
+
+		$ret = invokeMethod($gui, 'parseSortString', array('!a'));
+		$this->assertEquals($ret, array(
+			'a' => false,
+		));
+
 		$ret = invokeMethod($gui, 'parseSortString', array('a,!b,c'));
 		$this->assertEquals($ret, array(
 			'a' => true,
