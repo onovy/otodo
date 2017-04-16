@@ -29,5 +29,24 @@ class Config {
 				$phpError['message']);
 		}
 		self::$config = $ini;
+
+		$tz = @self::$config['core']['timezone'];
+		if ($tz) {
+			if (!@date_default_timezone_set($tz)) {
+				echo 'Timezone ' . $tz . ' from config core.timezone ' .
+					'is not correct. Please set one from ' .
+					'http://php.net/manual/en/timezones.php ' .
+					PHP_EOL;
+				exit(-1);
+			}
+		} else {
+			if (!ini_get('date.timezone')) {
+				echo 'Timezone is not set. Please set one from ' .
+					'http://php.net/manual/en/timezones.php ' .
+					'in config core.timezone or in php.ini' .
+					PHP_EOL;
+				exit(-1);
+			}
+		}
 	}
 }
