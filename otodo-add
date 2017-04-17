@@ -1,0 +1,85 @@
+#!/usr/bin/php
+<?php
+/*
+Copyright 2014-2017 Ondrej Novy
+
+This file is part of otodo.
+
+otodo is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+otodo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with otodo.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+require_once dirname(__FILE__) . '/init.php';
+
+$optsSetup = array(
+	'c:' => 'config:',
+	'h' => 'help',
+	't:' => 'text:',
+	'd:' => 'due:',
+);
+$optsReq = array('config', 'text');
+$opts = getopt(implode('', array_keys($optsSetup)), array_values($optsSetup));
+
+foreach ($opts as $n => $v) {
+	foreach ($optsSetup as $short => $long) {
+		$short = rtrim($short, ':');
+		$long = rtrim($long, ':');
+		if ($short == $n) {
+			$opts[$long] = $v;
+		}
+	}
+}
+
+foreach ($optsReq as $optReq) {
+	if (!array_key_exists($optReq, $opts)) {
+		$opts['help'] = false;
+		break;
+	}
+}
+
+if (array_key_exists('help', $opts)) {
+	echo $argv[0] . ' <opts>' . PHP_EOL;
+	echo PHP_EOL;
+	echo 'Options:' . PHP_EOL;
+	echo ' -h                          Help' . PHP_EOL;
+	echo ' -c <file>, --config <file>  Config file' . PHP_EOL;
+	echo ' -t <text>, --text <text>    Text of todo to add' . PHP_EOL;
+	echo ' -d <due>, --due <due>       Due date' . PHP_EOL;
+	exit(-1);
+}
+
+$configFile = $opts['config'];
+try {
+	Config::loadFile($configFile);
+} catch (ConfigLoadException $cle) {
+	echo $cle->getMessage() . PHP_EOL;
+	exit(-1);
+}
+
+$todos = new TodosEx();
+$todos->loadFromFile(Config::$config['core']['todo_file']);
+
+$t = new TodoEx($todos);
+$t->creationDate = new DateTime('today');
+$t->text = $opts['text'];
+if (array_key_exists('due', $opts)) {
+	$t->due = new DateTime($opts['due']);
+}
+$todos[] = $t;
+
+$todos->saveToFile(Config::$config['core']['todo_file']);
+$dir = Config::$config['core']['backup_dir'];
+if ($dir) {
+	$source = Config::$config['core']['todo_file'];
+	Todos::backup($source, $dir);
+}
