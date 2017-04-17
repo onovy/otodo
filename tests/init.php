@@ -1,6 +1,6 @@
 <?php
 /*
-Copyright 2014 Ondrej Novy
+Copyright 2014-2017 Ondrej Novy
 
 This file is part of otodo.
 
