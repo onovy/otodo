@@ -167,41 +167,10 @@ class Gui {
 	}
 
 	protected function backup() {
-		clearstatcache();
-
 		$dir = Config::$config['core']['backup_dir'];
 		if ($dir) {
 			$source = Config::$config['core']['todo_file'];
-			$c = 0;
-			do {
-				$target =
-					'todo.' . date('c') . '-' . str_pad($c, 2, '0', STR_PAD_LEFT) . '.txt';
-				$targetA =
-					$dir .
-					DIRECTORY_SEPARATOR .
-					$target;
-				$c++;
-			} while (file_exists($targetA));
-			$last =
-				$dir .
-				DIRECTORY_SEPARATOR .
-				'todo.last.txt';
-			if (file_exists($last)) {
-				$cLast = file($last);
-				$cSource = file($source);
-				sort($cLast);
-				sort($cSource);
-				if (implode("\n", $cLast) === implode("\n", $cSource)) {
-					return;
-				}
-			}
-			@mkdir($dir, 0700, true);
-			copy(
-				$source,
-				$targetA
-			);
-			@unlink($last);
-			symlink($target, $last);
+			Todos::backup($source, $dir);
 		}
 	}
 

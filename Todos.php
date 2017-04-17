@@ -280,4 +280,41 @@ class Todos implements Iterator, ArrayAccess, Countable {
 
 		return $sTodo;
 	}
+
+	public static function backup($todoFile, $backupDir) {
+		clearstatcache();
+
+		if ($backupDir) {
+			$c = 0;
+			do {
+				$target =
+					'todo.' . date('c') . '-' . str_pad($c, 2, '0', STR_PAD_LEFT) . '.txt';
+				$targetA =
+					$backupDir .
+					DIRECTORY_SEPARATOR .
+					$target;
+				$c++;
+			} while (file_exists($targetA));
+			$last =
+				$backupDir .
+				DIRECTORY_SEPARATOR .
+				'todo.last.txt';
+			if (file_exists($last)) {
+				$cLast = file($last);
+				$cSource = file($todoFile);
+				sort($cLast);
+				sort($cSource);
+				if (implode("\n", $cLast) === implode("\n", $cSource)) {
+					return;
+				}
+			}
+			@mkdir($backupDir, 0700, true);
+			copy(
+				$todoFile,
+				$targetA
+			);
+			@unlink($last);
+			symlink($target, $last);
+		}
+	}
 }
