@@ -695,7 +695,7 @@ class Gui {
 			echo 'g  Set recurrent      G  Unset recurrent' . PHP_EOL;
 			echo 'p  Priority           P  Unset priority' . PHP_EOL;
 			echo 'f  Next page          b  Previous page' . PHP_EOL;
-			echo 'h  History browser' . PHP_EOL;
+			echo 'h  History browser    l  Duplicate' . PHP_EOL;
 			echo 's  Sort: ';
 			$first = true;
 			foreach ($this->sort as $col => $asc) {
@@ -993,6 +993,19 @@ class Gui {
 					$this->todos[$num]->priority = null;
 					if ($this->changed()) {
 						$this->notice('Priority unset for todo ' . $num);
+					}
+				break;
+
+				// Duplicate
+				case 'l':
+					$num = $this->getLineNumber($cmd);
+					if ($num === null) {
+						break;
+					}
+					$t = clone $this->todos[$num];
+					$this->todos[] = $t;
+					if ($this->changed()) {
+						$this->notice('Todo ' . $num . ' duplicated');
 					}
 				break;
 
