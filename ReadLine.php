@@ -276,7 +276,7 @@ class ReadLine {
 								if ($this->line === '' && $this->historyNew !== null) {
 									$this->line = $this->historyNew;
 									$this->pos = mb_strlen($this->line);
-									continue;
+									break;
 								} else {
 									if ($this->line != '') {
 										$this->historyNew = $this->line;
