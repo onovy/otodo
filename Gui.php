@@ -366,7 +366,7 @@ class Gui {
 		if (strlen($line) > 0 && preg_match('/(\d+|l)?$/', $line, $m)) {
 			$num = null;
 			if (!isset($m[1]) && count($this->filteredTodos) == 1) {
-				$num = array_pop(array_keys($this->filteredTodos));
+				$num = array_keys($this->filteredTodos)[0];
 			} elseif (isset($m[1]) && $m[1] == 'l' && $this->lastLineNumber !== null) {
 				$num = $this->lastLineNumber;
 			} elseif (isset($m[1]) && is_numeric($m[1])) {
