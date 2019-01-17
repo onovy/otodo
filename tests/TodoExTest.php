@@ -20,7 +20,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'init.php';
 
-class TodoExTest extends PHPUnit_Framework_TestCase {
+class TodoExTest extends \PHPUnit\Framework\TestCase {
 	public function testInOut() {
 		$tests = array(
 			'dummy due:2014-02-01',
@@ -129,7 +129,7 @@ class TodoExTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 */
 	public function testWrongSet() {
 		$t = new Todo(null);
@@ -137,7 +137,7 @@ class TodoExTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @expectedException PHPUnit_Framework_Error
+	 * @expectedException PHPUnit\Framework\Error\Error
 	 */
 	public function testWrongGet() {
 		$t = new Todo(null);

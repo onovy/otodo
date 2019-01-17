@@ -20,7 +20,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'init.php';
 
-class RecurrentTest extends PHPUnit_Framework_TestCase {
+class RecurrentTest extends \PHPUnit\Framework\TestCase {
 	public function testInOut() {
 		$tests = array(
 			'1d' => '1d',
@@ -74,6 +74,7 @@ class RecurrentTest extends PHPUnit_Framework_TestCase {
 				$this->fail($test . ' should throw exception!');
 			} catch (RecurrentParseException $rpe) {
 				// This is OK
+				$this->assertTrue(true);
 			}
 		}
 	}

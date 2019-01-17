@@ -20,7 +20,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'init.php';
 
-class TodosTest extends PHPUnit_Framework_TestCase {
+class TodosTest extends \PHPUnit\Framework\TestCase {
 	public function testInOut() {
 		$ts = new Todos();
 		$ts->loadFromFile('todo.txt');

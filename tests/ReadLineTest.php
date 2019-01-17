@@ -20,7 +20,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'init.php';
 
-class ReadLineTest extends PHPUnit_Framework_TestCase {
+class ReadLineTest extends \PHPUnit\Framework\TestCase {
 	public function testHistoryInOut() {
 		$r = new ReadLine();
 		$r->historyAdd('aa');

@@ -20,7 +20,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'init.php';
 
-class FuncTest extends PHPUnit_Framework_TestCase {
+class FuncTest extends \PHPUnit\Framework\TestCase {
 	public function testMbStrPad() {
 		$this->assertEquals(mb_str_pad('heřlo', 7, 'A', STR_PAD_RIGHT), 'heřloAA');
 		$this->assertEquals(mb_str_pad('heřlo', 7, 'A'), 'heřloAA');

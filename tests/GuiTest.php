@@ -20,7 +20,7 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 require_once 'init.php';
 
-class GuiTest extends PHPUnit_Framework_TestCase {
+class GuiTest extends \PHPUnit\Framework\TestCase {
 	public function testParseDate() {
 		Config::loadFile('../config.ini');
 
