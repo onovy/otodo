@@ -7,7 +7,7 @@ Powerful TUI for todo.txt.
 ![Screenshot](https://raw.githubusercontent.com/onovy/otodo/master/screenshot.png "Screenshot")
 
 ## Requirements ##
-otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 5.4, but it should work on older version. No extension is required. It should work on almost any Unix-like system, tested on Mac OS X.
+otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 7.2, but it should work on 7.0+. No extension is required. It should work on almost any Unix-like system, tested on Ubuntu.
 
 ## Installation ##
 There isn't any releases, I consider master branch at Github as stable.
