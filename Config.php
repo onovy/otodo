@@ -22,7 +22,7 @@ class Config {
 	public static $config;
 
 	public static function loadFile($filename) {
-		$ini = @parse_ini_file($filename, true);
+		$ini = @parse_ini_file(self::fixHomeDirectory($filename), true);
 		if ($ini === FALSE) {
 			$phpError = error_get_last();
 			throw new ConfigLoadException('Can\'t load config file: ' .
@@ -47,6 +47,24 @@ class Config {
 					PHP_EOL;
 				exit(-1);
 			}
+		}
+
+		$dirs = array('todo_file', 'archive_file', 'backup_dir');
+		foreach ($dirs as $dir) {
+			self::$config['core'][$dir] = self::fixHomeDirectory(self::$config['core'][$dir]);
+		}
+	}
+
+	private static function fixHomeDirectory($dir) {
+		if ($dir[0] === '~') {
+			if (isset($_SERVER['HOME'])) {
+				$home = $_SERVER['HOME'];
+			} else {
+				$home = getenv('HOME');
+			}
+			return $home . substr($dir, 1);
+		} else {
+			return $dir;
 		}
 	}
 }

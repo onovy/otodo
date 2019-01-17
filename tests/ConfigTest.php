@@ -33,4 +33,15 @@ class ConfigTest extends \PHPUnit\Framework\TestCase {
 	public function testConfigWrong() {
 		Config::loadFile('not exists');
 	}
+
+	public function testFixHomeDirectory() {
+		$ret = invokeStaticMethod('Config', 'fixHomeDirectory', array('dummy'));
+		$this->assertEquals($ret, 'dummy');
+
+		$ret = invokeStaticMethod('Config', 'fixHomeDirectory', array('~'));
+		$this->assertEquals($ret, getenv('HOME'));
+
+		$ret = invokeStaticMethod('Config', 'fixHomeDirectory', array('~/dummy'));
+		$this->assertEquals($ret, getenv('HOME') . '/dummy');
+	}
 }

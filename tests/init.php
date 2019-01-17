@@ -35,6 +35,14 @@ function invokeMethod(&$object, $methodName, array $parameters = array()) {
 	return $method->invokeArgs($object, $parameters);
 }
 
+function invokeStaticMethod($class, $methodName, array $parameters = array()) {
+	$reflection = new \ReflectionClass($class);
+	$method = $reflection->getMethod($methodName);
+	$method->setAccessible(true);
+
+	return $method->invokeArgs(null, $parameters);
+}
+
 /**
  * Get value of protected/private properties of a class.
  *
