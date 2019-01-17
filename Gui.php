@@ -258,7 +258,7 @@ class Gui {
 			if ($this->lastLineNumber !== null && $num == 'l') {
 				$num = $this->lastLineNumber;
 			} else if (count($this->filteredTodos) == 1) {
-				$num = array_pop(array_keys($this->filteredTodos));
+				$num = array_keys($this->filteredTodos)[0];
 			} else {
 				$num = $this->readLine->read('Num: ');
 			}
@@ -765,7 +765,8 @@ class Gui {
 						}
 
 						$this->todos[] = $t;
-						$this->lastLineNumber = array_pop($this->todos->array_keys());
+						$keys = $this->todos->array_keys();
+						$this->lastLineNumber = array_pop($keys);
 						if ($this->changed()) {
 							$this->notice('Todo added');
 						}
