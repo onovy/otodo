@@ -341,7 +341,7 @@ class Gui {
 		// Clear last highlight
 		if ($this->lastHighlight !== null) {
 			$i = $this->lastHighlight;
-			echo "\033[s";
+			echo "\0337";
 			if ($i % 2 == 0) {
 				echo $this->config2color(Config::$config['color']['todo_odd']);
 			} else {
@@ -357,7 +357,7 @@ class Gui {
 				echo ' ';
 				$x += $this->columnsLength[$l] + 3;
 			}
-			echo "\033[u";
+			echo "\0338";
 			echo $this->config2color(Config::$config['color']['default']);
 			$this->lastHighlight = null;
 		}
@@ -380,7 +380,7 @@ class Gui {
 			if (isset($this->idLineIndex[$num])) {
 				$highlight = $this->idLineIndex[$num] + 2;
 				$this->lastHighlight = $highlight;
-				echo "\033[s";
+				echo "\0337";
 				if ($highlight % 2 == 0) {
 					echo $this->config2color(Config::$config['color']['todo_odd']);
 				} else {
@@ -396,7 +396,7 @@ class Gui {
 					echo '▶';
 					$x += $this->columnsLength[$l] + 3;
 				}
-				echo "\033[u";
+				echo "\0338";
 				echo $this->config2color(Config::$config['color']['default']);
 			}
 		}
