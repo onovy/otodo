@@ -7,7 +7,15 @@ Powerful TUI for todo.txt.
 ![Screenshot](https://raw.githubusercontent.com/onovy/otodo/master/screenshot.png "Screenshot")
 
 ## Requirements ##
-otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 7.2, but it should work on 7.0+. No extension is required. It should work on almost any Unix-like system, tested on Ubuntu.
+otodo is written in PHP (yes, in PHP!). So you need PHP interpreter. I'm using PHP 7.2, but it should work on 7.0+. mbstring is the only required dependency.
+
+```
+apt install php-mbstring
+```
+
+It should work on almost any Unix-like system, tested on Ubuntu. 
+
+
 
 ## Installation ##
 There isn't any releases, I consider master branch at Github as stable.
