@@ -26,6 +26,7 @@ class Recurrent {
 
 	public function __construct($str) {
 		$this->fromNow = false;
+		$str = strval($str);
 
 		if ($str[0] == '+') {
 			$this->fromNow = true;
