@@ -62,6 +62,21 @@ class GuiTest extends \PHPUnit\Framework\TestCase {
 		$dt->modify('+2 year');
 		$ret = invokeMethod($gui, 'parseDate', array('+2y'))->format('Y-m-d');
 		$this->assertEquals($ret, $dt->format('Y-m-d'));
+
+		$dt = new DateTime('today');
+		$ret = invokeMethod($gui, 'parseDate', array($dt->format('d. m.')))->format('Y-m-d');
+		$this->assertEquals($ret, $dt->format('Y-m-d'));
+
+		$dt = new DateTime('today');
+		$dt->modify('+1 day');
+		$ret = invokeMethod($gui, 'parseDate', array($dt->format('d. m.')))->format('Y-m-d');
+		$this->assertEquals($ret, $dt->format('Y-m-d'));
+
+		$dt = new DateTime('today');
+		$dt->modify('-1 day');
+		$ret = invokeMethod($gui, 'parseDate', array($dt->format('d. m.')))->format('Y-m-d');
+		$dt->modify('+1 year');
+		$this->assertEquals($ret, $dt->format('Y-m-d'));
 	}
 
 	public function testParseSortString() {

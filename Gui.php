@@ -202,9 +202,19 @@ class Gui {
 		$date = trim($date);
 		$dt = false;
 		foreach (Config::$config['gui']['date_format_in'] as $format) {
-			$dt = DateTime::createFromFormat($format, $date);
+			$dt = DateTime::createFromFormat('!' . $format, $date);
 			if ($dt !== false) {
-				$dt->modify('00.00.00');
+				if ($dt->format('Y') == 1970) {
+					$dt = DateTime::createFromFormat($format, $date);
+					$dt->modify('00.00.00');
+					$now = new DateTime('today');
+					$now->modify('00.00.00');
+					$i = $dt->diff($now);
+					if ($i->days > 0 && $i->invert == 0) {
+						$dt->modify('+1 year');
+					}
+				}
+
 				break;
 			}
 		}
