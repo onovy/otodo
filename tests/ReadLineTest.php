@@ -69,10 +69,9 @@ class ReadLineTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($h, array());
 	}
 
-	/**
-	 * @expectedException HistoryLoadException
-	 */
 	public function testHistoryLoadWrong() {
+                $this->expectException(HistoryLoadException::class);
+
 		$file = tempnam(sys_get_temp_dir(), 'otodo');
 
 		$r = new ReadLine();
@@ -81,10 +80,9 @@ class ReadLineTest extends \PHPUnit\Framework\TestCase {
 		unlink($file);
 	}
 
-	/**
-	 * @expectedException HistoryLoadException
-	 */
 	public function testHistoryLoadWrong2() {
+                $this->expectException(HistoryLoadException::class);
+
 		$file = tempnam(sys_get_temp_dir(), 'otodo');
 		file_put_contents($file, serialize('a'));
 

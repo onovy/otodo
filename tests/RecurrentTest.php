@@ -121,17 +121,15 @@ class RecurrentTest extends \PHPUnit\Framework\TestCase {
 		}
 	}
 
-	/**
-	 * @expectedException RecurrentParseException
-	 */
 	public function testRecurrWrongC() {
+		$this->expectException(RecurrentParseException::class);
+
 		new Recurrent('1wrong');
 	}
 
-	/**
-	 * @expectedException RecurrentParseException
-	 */
 	public function testRecurrWrongR() {
+		$this->expectException(RecurrentParseException::class);
+
 		$r = new Recurrent('1d');
 		$r->unit = 'wrong';
 		$r->recurr(null);

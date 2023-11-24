@@ -199,18 +199,16 @@ class TodoTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($t->priority, null);
 	}
 
-	/**
-	 * @expectedException PHPUnit\Framework\Error\Error
-	 */
 	public function testWrongSet() {
+		$this->expectError();
+
 		$t = new Todo(null);
 		$t->notExists = '';
 	}
 
-	/**
-	 * @expectedException PHPUnit\Framework\Error\Error
-	 */
 	public function testWrongGet() {
+		$this->expectError();
+
 		$t = new Todo(null);
 		$t->notExists;
 	}

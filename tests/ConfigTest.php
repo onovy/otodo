@@ -27,10 +27,9 @@ class ConfigTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals(Config::$config['core']['todo_file'], 'todo.txt');
 	}
 
-	/**
-	 * @expectedException ConfigLoadException
-	 */
 	public function testConfigWrong() {
+		$this->expectException(ConfigLoadException::class);
+
 		Config::loadFile('not exists');
 	}
 

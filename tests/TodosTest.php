@@ -30,10 +30,9 @@ class TodosTest extends \PHPUnit\Framework\TestCase {
 		unlink($file);
 	}
 
-	/**
-	 * @expectedException TodosLoadException
-	 */
 	public function testLoadFail() {
+		$this->expectException(TodosLoadException::class);
+
 		$ts = new Todos();
 		$ts->loadFromFile('dummy file not exists');
 	}
@@ -79,10 +78,9 @@ class TodosTest extends \PHPUnit\Framework\TestCase {
 		unlink($file);
 	}
 
-	/**
-	 * @expectedException UnknownSortingParamException
-	 */
 	public function testSortWrong() {
+		$this->expectException(UnknownSortingParamException::class);
+
 		$ts = new Todos();
 		$ts->loadFromFile('todo.txt');
 		$ts->sort(array(
