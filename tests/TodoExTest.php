@@ -89,6 +89,7 @@ class TodoExTest extends \PHPUnit\Framework\TestCase {
 		$t->text = 'dummy';
 		$t->rec = new Recurrent('+1d');
 		$t->due = new DateTime('2014-03-01');
+		$t->creationDate = new DateTime('2013-03-01');
 		$t->markDone();
 		$this->assertTrue($ts->count() == 1);
 		$keys = $ts->array_keys();
@@ -97,6 +98,7 @@ class TodoExTest extends \PHPUnit\Framework\TestCase {
 		$this->assertEquals($t->text, 'dummy');
 		$this->assertEquals($t->rec->toString(), '+1d');
 		$this->assertEquals($t->due->format('Y-m-d'), '2014-03-02');
+		$this->assertEquals($t->creationDate->format('Y-m-d'), (new DateTime())->format('Y-m-d'));
 
 		$t->unmarkDone();
 		$this->assertFalse($t->done);

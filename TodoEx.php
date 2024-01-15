@@ -53,6 +53,7 @@ class TodoEx extends Todo {
 	public function markDone() {
 		if ($this->rec) {
 			$t = clone $this;
+			$t->creationDate = new DateTime('today');
 			$t->due = $this->rec->recurr($this->due);
 			$t->addons['due'] = $t->due->format('Y-m-d');
 			$this->todos[] = $t;
