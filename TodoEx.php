@@ -20,13 +20,13 @@ along with otodo.  If not, see <http://www.gnu.org/licenses/>.
 
 class TodoEx extends Todo {
 	private $due;
-	private $recurrent;
-	protected $validExtensions = array('due', 'recurrent');
+	private $rec;
+	protected $validExtensions = array('due', 'rec', 'recurrent');
 
 	protected function clean() {
 		parent::clean();
 		$this->due = null;
-		$this->recurrent = null;
+		$this->rec = null;
 	}
 
 	protected function parseAddons() {
@@ -34,15 +34,26 @@ class TodoEx extends Todo {
 		if (isset($this->addons['due'])) {
 			$this->due = $this->parseDate($this->addons['due']);
 		}
+		if (isset($this->addons['rec'])) {
+			$this->rec = new Recurrent($this->addons['rec']);
+		}
 		if (isset($this->addons['recurrent'])) {
-			$this->recurrent = new Recurrent($this->addons['recurrent']);
+			$val = $this->addons['recurrent'];
+			if ($val[0] === '+') {
+				$val = substr($val, 1);
+			} else {
+				$val = '+' . $val;
+			}
+			$this->rec = new Recurrent($val);
+			unset($this->addons['recurrent']);
+			$this->addons['rec'] = $this->rec->toString();
 		}
 	}
 
 	public function markDone() {
-		if ($this->recurrent) {
+		if ($this->rec) {
 			$t = clone $this;
-			$t->due = $this->recurrent->recurr($this->due);
+			$t->due = $this->rec->recurr($this->due);
 			$t->addons['due'] = $t->due->format('Y-m-d');
 			$this->todos[] = $t;
 		}
@@ -60,13 +71,13 @@ class TodoEx extends Todo {
 					$this->addons['due'] = $value->format('Y-m-d');
 				}
 			break;
-			case 'recurrent':
-				$this->recurrent = $value;
+			case 'rec':
+				$this->rec = $value;
 				if ($value === null) {
-					unset($this->addons['recurrent']);
+					unset($this->addons['rec']);
 				} else {
 					assert($value instanceof Recurrent);
-					$this->addons['recurrent'] = $value->toString();
+					$this->addons['rec'] = $value->toString();
 				}
 			break;
 			default:
@@ -80,8 +91,8 @@ class TodoEx extends Todo {
 			case 'due':
 				return $this->due;
 			break;
-			case 'recurrent':
-				return $this->recurrent;
+			case 'rec':
+				return $this->rec;
 			break;
 			default:
 				return parent::__get($name);
@@ -97,8 +108,8 @@ class TodoEx extends Todo {
 		if ($this->due !== null) {
 			echo 'Due: ' . $this->due->format('Y-m-d') . PHP_EOL;
 		}
-		if ($this->recurrent !== null) {
-			echo 'Recurrent: ' . $this->recurrent->toString() . PHP_EOL;
+		if ($this->rec !== null) {
+			echo 'Recurrent: ' . $this->rec->toString() . PHP_EOL;
 		}
 	}
 }

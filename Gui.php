@@ -75,8 +75,8 @@ class Gui {
 			'padValue' => STR_PAD_RIGHT,
 			'shorten' => false,
 		),
-		'recurrent' => array(
-			'title' => 'Recu.',
+		'rec' => array(
+			'title' => 'Rec.',
 			'padTitle' => STR_PAD_RIGHT,
 			'padValue' => STR_PAD_RIGHT,
 			'shorten' => false,
@@ -432,9 +432,9 @@ class Gui {
 					$val = $todo->$column->format(Config::$config['gui']['date_format_out']);
 				}
 			break;
-			case 'recurrent':
-				if ($todo->recurrent) {
-					$val = $todo->recurrent->toString();
+			case 'rec':
+				if ($todo->rec) {
+					$val = $todo->rec->toString();
 				}
 			break;
 			case 'projects':
@@ -905,19 +905,19 @@ class Gui {
 						break;
 					}
 					$recurrent = null;
-					if ($this->todos[$num]->recurrent) {
-						$recurrent = $this->todos[$num]->recurrent->toString();
+					if ($this->todos[$num]->rec) {
+						$recurrent = $this->todos[$num]->rec->toString();
 					}
 					$str = $this->readLine->read('Recurrent: ', $recurrent);
 					if ($str === '') {
-						$this->todos[$num]->recurrent = null;
+						$this->todos[$num]->rec = null;
 						if ($this->changed()) {
 							$this->notice('Todo ' . $num . ' set not recurrent');
 						}
 					} else {
 						try {
 							$r = new Recurrent($str);
-							$this->todos[$num]->recurrent = $r;
+							$this->todos[$num]->rec = $r;
 							if ($this->changed()) {
 								$this->notice('Todo ' . $num . ' set recurrent ' . $r->toString());
 							}
@@ -933,7 +933,7 @@ class Gui {
 					if ($num === null) {
 						break;
 					}
-					$this->todos[$num]->recurrent = null;
+					$this->todos[$num]->rec = null;
 					if ($this->changed()) {
 						$this->notice('Todo ' . $num . ' set not recurrent');
 					}

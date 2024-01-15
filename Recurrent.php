@@ -25,11 +25,11 @@ class Recurrent {
 	public $businessDay = false;
 
 	public function __construct($str) {
-		$this->fromNow = false;
+		$this->fromNow = true;
 		$str = strval($str);
 
 		if ($str[0] == '+') {
-			$this->fromNow = true;
+			$this->fromNow = false;
 			$str = substr($str, 1);
 		}
 		if (!preg_match('/^(\d+)([dwmy]?) ?(b)?$/', $str, $matches)) {
@@ -48,7 +48,7 @@ class Recurrent {
 
 	public function toString() {
 		$out = '';
-		if ($this->fromNow) {
+		if (!$this->fromNow) {
 			$out .= '+';
 		}
 		$out .= $this->count . $this->unit;
